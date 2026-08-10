@@ -1,11 +1,14 @@
 import Link from 'next/link';
+import BrewserLogo from '@/assets/Brewser_logo.png';
 
 export default function HomePage() {
   return (
     <div className="flex flex-col justify-center text-center flex-1 px-4">
       <img
-        src="https://raw.githubusercontent.com/natureglass/Brewser/refs/heads/main/romfs/shell/assets/Brewser_logo.png"
+        src={BrewserLogo.src}
         alt="Brewser logo"
+        width={BrewserLogo.width}
+        height={BrewserLogo.height}
         className="mx-auto mb-6 h-32 w-auto"
       />
       <h1 className="text-3xl font-bold mb-4">Brewser Documentation</h1>
