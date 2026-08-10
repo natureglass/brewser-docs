@@ -1,31 +1,128 @@
 import Link from 'next/link';
+import { ArrowRight, Cpu, Plug, Rocket, Upload } from 'lucide-react';
 import BrewserLogo from '@/assets/Brewser_logo.png';
+
+const sections = [
+  {
+    title: 'Getting started',
+    href: '/docs',
+    icon: Rocket,
+    description:
+      'Install Brewser on your Switch and open your first app in minutes.',
+  },
+  {
+    title: 'Publishing apps',
+    href: '/docs/publishing',
+    icon: Upload,
+    description:
+      'Submit through GitHub, pass the security scan, ship to the catalogue.',
+  },
+  {
+    title: 'Web API support',
+    href: '/docs/features',
+    icon: Plug,
+    description:
+      'WebGL2, WebSerial, Bluetooth, MIDI — what works, side by side with Chromium.',
+  },
+  {
+    title: 'Runtime internals',
+    href: '/docs/runtime',
+    icon: Cpu,
+    description:
+      'V8, Skia, and Mesa on Tegra X1 — how the engine actually works.',
+  },
+];
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col justify-center text-center flex-1 px-4">
-      <img
-        src={BrewserLogo.src}
-        alt="Brewser logo"
-        width={BrewserLogo.width}
-        height={BrewserLogo.height}
-        className="mx-auto mb-6 h-32 w-auto rounded-[50%]"
-      />
-      <h1 className="text-3xl font-bold mb-4">Brewser Documentation</h1>
-      <p className="mb-6">
-        Brewser is an online platform for creators, tinkerers, and developers<br />
-        a curiosity-driven playground for sharing your ideas and projects with the world.<br />
-        If you`ve ever built something clever and then watched it vanish into the void,<br />
-        ...you`re exactly who we made this for.
-      </p>
-      <p>
-        <Link
-          href="/docs"
-          className="inline-block rounded-lg bg-fd-primary px-4 py-2 font-medium text-fd-primary-foreground"
-        >
-          Open the Docs
-        </Link>
-      </p>
-    </div>
+    <main className="flex flex-1 flex-col justify-center px-4 py-16">
+      <div className="mx-auto w-full max-w-3xl text-center">
+        <img
+          src={BrewserLogo.src}
+          alt="Brewser logo"
+          width={BrewserLogo.width}
+          height={BrewserLogo.height}
+          className="mx-auto mb-6 h-28 w-auto rounded-full"
+        />
+
+        <h1 className="mb-4 text-4xl font-bold tracking-tight">
+          Brewser documentation
+        </h1>
+
+        <p className="mx-auto mb-8 max-w-xl text-fd-muted-foreground">
+          A web runtime for Nintendo Switch homebrew. Build with standard Web
+          APIs — if it runs in Chrome, it runs on your Switch.
+        </p>
+
+        <div className="mb-12 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/docs"
+            className="rounded-lg bg-amber-400 px-5 py-2.5 font-medium text-amber-950 transition-colors hover:bg-amber-300"
+          >
+            Get started
+          </Link>
+          <Link
+            href="/docs/publishing"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-fd-border px-5 py-2.5 font-medium transition-colors hover:bg-fd-accent"
+          >
+            Publish your first app
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+
+        {/*
+          Drop a short hardware capture (a Three.js demo or Neon Serpent
+          running on a real Switch) at public/media/switch-demo.mp4 and
+          uncomment this block — it sells the project better than any copy:
+
+        <video
+          className="mx-auto mb-12 w-full max-w-xl rounded-xl border border-fd-border"
+          src="/media/switch-demo.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        */}
+
+        <div className="grid grid-cols-1 gap-4 text-left sm:grid-cols-2">
+          {sections.map((section) => (
+            <Link
+              key={section.href}
+              href={section.href}
+              className="group rounded-xl border border-fd-border bg-fd-card p-5 transition-colors hover:border-fd-primary/40 hover:bg-fd-accent/50"
+            >
+              <section.icon className="size-5 text-amber-600 dark:text-amber-400" />
+              <p className="mb-1 mt-3 font-medium">{section.title}</p>
+              <p className="text-sm text-fd-muted-foreground">
+                {section.description}
+              </p>
+            </Link>
+          ))}
+        </div>
+
+        <footer className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-fd-muted-foreground">
+          <a
+            href="https://brewser.tech"
+            className="transition-colors hover:text-fd-foreground"
+          >
+            brewser.tech
+          </a>
+          <a
+            href="https://play.brewser.tech"
+            className="transition-colors hover:text-fd-foreground"
+          >
+            App catalogue
+          </a>
+          <a
+            href="https://github.com/natureglass"
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-fd-foreground"
+          >
+            GitHub
+            <ArrowRight className="size-3.5 -rotate-45" />
+          </a>
+        </footer>
+      </div>
+    </main>
   );
 }
