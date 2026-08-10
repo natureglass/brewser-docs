@@ -36,13 +36,13 @@ const sections = [
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col justify-center px-4 py-16">
-      <div className="mx-auto w-full max-w-3xl text-center">
+      <div className="mx-auto w-full max-w-3xl rounded-lg border border-[#e6e6f0] bg-white px-10 py-5 text-center shadow-[0_0_15px_0_rgba(0,0,0,0.06)]">
         <img
           src={BrewserLogo.src}
           alt="Brewser logo"
           width={BrewserLogo.width}
           height={BrewserLogo.height}
-          className="mx-auto mb-6 h-28 w-auto rounded-full"
+          className="mx-auto mb-6 h-28 w-auto"
         />
 
         <h1 className="mb-4 text-4xl font-bold tracking-tight">
