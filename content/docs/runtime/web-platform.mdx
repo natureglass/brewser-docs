@@ -1,0 +1,31 @@
+---
+title: Web Platform Support
+description: The standards Brewser implements — and the promise behind them
+---
+
+Brewser's compatibility promise is simple: **if your app runs on Brewser, it
+runs in a desktop browser too.** We implement standard web APIs with standard
+shapes — never custom `brewser.*` namespaces.
+
+## Broadly supported
+
+- Modern JavaScript (ES modules, async/await, workers-adjacent patterns)
+- `fetch`, WebSocket, and standard networking
+- Canvas 2D, WebGL 1, and WebGL 2 (see [Graphics](/docs/runtime/graphics))
+- Web Audio
+- Gamepad API, Touch events, DeviceOrientation
+- WebSerial, WebBluetooth, Web MIDI, Web NFC (see
+  [Hardware APIs](/docs/runtime/hardware-apis))
+- localStorage and app-scoped storage
+
+## Practical development loop
+
+Because Brewser apps are standard web apps, the recommended workflow is:
+
+1. Build and iterate in Chrome on your desktop.
+2. Test on Brewser (emulator or real hardware) for performance and
+   device-specific behaviour.
+3. Submit via the [publishing pipeline](/docs/publishing).
+
+{/* TODO: link to a canonical "API support matrix" page once the
+conformance-backed table is published */}

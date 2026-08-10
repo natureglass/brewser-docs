@@ -1,0 +1,28 @@
+---
+title: Input & Sensors
+description: Gamepad, touch and motion controls
+---
+
+## Gamepad
+
+Joy-Cons and Pro Controllers surface through the standard **Gamepad API**
+(`navigator.getGamepads()`). Buttons and axes follow the standard mapping, so
+gamepad-aware web games generally work unmodified.
+
+## Touch
+
+The Switch touchscreen fires standard **Touch events** (and pointer events).
+Remember that touch only works in handheld mode.
+
+## Motion / orientation
+
+**DeviceOrientationEvent** is implemented to W3C spec, mapped to the Switch's
+landscape physical frame and verified against real hardware — tilting the
+console upright reports β=+90°, rolling right reports γ=−90°, exactly as a
+phone in landscape would.
+
+## Keyboard
+
+The on-screen keyboard is available for text input.
+
+{/* TODO: document any software-keyboard invocation specifics */}

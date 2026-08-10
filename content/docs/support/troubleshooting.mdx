@@ -1,0 +1,27 @@
+---
+title: Troubleshooting
+description: Common problems and fixes
+---
+
+## An app won't start
+
+- Check your network connection — apps stream from the catalogue.
+- Try relaunching Brewser; each launch gets a fresh runtime context.
+
+## Graphics look wrong
+
+- If an app renders incorrectly but works in Chrome, it may hit a WebGL
+  conformance gap — please report it with the app name.
+
+## Sign-in problems
+
+- Device-code sign-in codes expire quickly; request a fresh code if entry
+  fails.
+
+## My hardware device isn't detected
+
+- Confirm the app's manifest declares the capability (the picker only shows
+  for declared APIs).
+- For USB serial devices: check the cable supports data (not charge-only).
+
+{/* TODO: grow this page from real user reports after launch */}

@@ -1,0 +1,27 @@
+---
+title: Known Limitations
+description: What doesn't (yet) work
+---
+
+Brewser aims for the full web platform, but it's an evolving runtime on
+constrained hardware. Current notable limitations:
+
+## Web platform
+
+- **WebGL conformance is a work in progress.** Common paths are solid
+  (major Three.js scenes run on real hardware); long-tail conformance tests
+  still surface gaps. Report anything that behaves differently from Chrome.
+- **Unity WebGL 2 exports** are not yet supported (WebGL 1 exports work).
+- **Video codec support is limited.** {/* TODO: document exact codec/decoder
+  status */}
+
+## Platform
+
+- Touch input is handheld-only (hardware limitation).
+- Apps are expected to be self-contained; runtime module resolution is
+  local-only.
+
+## The compatibility promise, inverted
+
+Everything on this page is a bug or a roadmap item, not a design decision —
+the goal remains: *if Chrome does it, Brewser should too.*

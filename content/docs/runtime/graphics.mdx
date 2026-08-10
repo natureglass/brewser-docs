@@ -1,0 +1,36 @@
+---
+title: Graphics
+description: Canvas 2D, WebGL 1 and WebGL 2 on Brewser
+---
+
+## Canvas 2D
+
+Fully supported, backed by Skia. Text, paths, images, compositing and
+`toDataURL` all work as in a desktop browser.
+
+## WebGL 1
+
+Supported and the safest target for maximum compatibility, including Unity
+WebGL 1 exports.
+
+## WebGL 2
+
+Supported, including advanced usage — complex Three.js scenes run
+JIT-optimized on real hardware. WebGL 2 support is under active conformance
+testing; if you hit a missing method or extension, please report it.
+
+## Shader tips
+
+GLSL fragment/vertex shaders work well and are a great fit for the platform —
+generative art, demoscene-style effects and full-screen shader apps are a
+Brewser specialty.
+
+## Performance notes
+
+The Tegra X1 is capable but not a desktop GPU:
+
+- Prefer flat fills over gradients and shadows in UI-heavy apps.
+- Batch draw calls; avoid per-frame shader recompilation.
+- Target 720p (docked output is scaled).
+
+See [Hints & Tips → Performance](/docs/tips/performance) for more.

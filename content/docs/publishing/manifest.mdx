@@ -1,0 +1,30 @@
+---
+title: Manifest & Permissions
+description: Declaring what your app needs
+---
+
+Every Brewser app ships a manifest describing its identity and the hardware
+capabilities it needs.
+
+## Why declare permissions?
+
+Users see the required capabilities **before** launching your app, and the
+runtime only exposes the hardware APIs you declared. Combined with the
+runtime device picker, this means no app ever silently accesses hardware.
+
+## Declarable capabilities
+
+- `serial` — WebSerial (USB CDC devices such as ESP32/Arduino)
+- `bluetooth` — WebBluetooth
+- `midi` — Web MIDI
+- `nfc` — Web NFC
+- `usb` — WebUSB
+
+{/* TODO: paste the canonical manifest JSON schema + a full example once
+frozen */}
+
+## Best practice
+
+Declare the minimum you need. Apps requesting no hardware access at all skip
+the permission prompt entirely and offer the smoothest click-to-play
+experience.

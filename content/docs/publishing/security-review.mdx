@@ -1,0 +1,31 @@
+---
+title: Security Review
+description: How submissions are scanned before publication
+---
+
+Every submission passes through Brewser's automated security scanner before
+it can be published.
+
+## What the scanner does
+
+The scanner performs static analysis of your JavaScript — building an AST and
+tracking how data flows through the code (taint tracking) — looking for
+patterns like hidden network exfiltration, obfuscated payloads, or abuse of
+hardware APIs.
+
+## Verdicts
+
+| Verdict | Meaning | Effect |
+| --- | --- | --- |
+| **GOOD** | No findings | Eligible for publication |
+| **SUSPICIOUS** | Needs a closer look | Manual review before publication |
+| **DANGEROUS** | Clear malicious pattern | Blocked |
+
+The verdict is a **publish gate**: only cleared apps reach the catalogue.
+
+## Tips for a clean pass
+
+- Avoid `eval` and dynamically-constructed code.
+- Keep third-party bundles readable — heavily obfuscated code is more likely
+  to be flagged for manual review.
+- Only call the APIs your manifest declares.

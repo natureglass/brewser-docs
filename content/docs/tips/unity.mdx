@@ -1,0 +1,25 @@
+---
+title: Unity WebGL Exports
+description: Running Unity games on Brewser
+---
+
+Unity's WebGL export target can produce Brewser-compatible builds.
+
+## Current status
+
+- **WebGL 1 exports: working.** Confirmed running on Brewser.
+- **WebGL 2 exports: in progress.** Under active compatibility work — track
+  announcements for updates.
+
+## Recommended Player Settings
+
+- Graphics API: **WebGL 1** (for now)
+- Compression: prefer uncompressed or gzip
+  {/* TODO: confirm final recommended compression/decompression fallback
+  settings */}
+- Strip engine code and disable unneeded modules to shrink the bundle
+
+## Testing
+
+Iterate against Chrome first, then verify on Brewser. Keep an eye on memory —
+Unity heaps are large, and the console is less forgiving than a desktop.

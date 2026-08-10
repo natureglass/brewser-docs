@@ -1,0 +1,28 @@
+---
+title: Performance
+description: Making apps fast on Tegra X1
+---
+
+The Switch's Tegra X1 is a 2015-era mobile chip. Fast apps respect that.
+
+## UI rendering
+
+- **Flat fills beat gradients and shadows.** CSS gradients and box-shadows
+  are expensive on the software-composited UI path — flat colors render
+  dramatically faster. (Brewser's own catalogue follows this rule.)
+- Minimise layout thrash; batch DOM updates.
+
+## WebGL
+
+- Batch draw calls; minimise state changes per frame.
+- Compile shaders once at startup, never per frame.
+- Prefer WebGL 1 techniques when you don't need WebGL 2 features — the
+  compatibility surface is broadest there.
+- Watch texture sizes; 4K textures are rarely worth it on a 720p handheld
+  screen.
+
+## JavaScript
+
+- V8's JIT is active on Brewser, so hot loops optimise well — but avoid
+  allocation storms in your frame loop (object pooling pays off).
+- Defer heavy work out of the boot path so click-to-play feels instant.

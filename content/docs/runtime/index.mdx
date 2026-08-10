@@ -1,0 +1,30 @@
+---
+title: How the Runtime Works
+description: What happens when you launch a Brewser app on your Switch
+---
+
+Brewser runs as a homebrew application on a custom-firmware Nintendo Switch
+(via [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere)). It is not a
+port of an existing browser — it's a purpose-built web runtime, evolved from
+the [nx.js](https://nxjs.n8.io) project.
+
+## Launch flow
+
+1. You open Brewser from the Homebrew Menu.
+2. The catalogue loads from [play.brewser.tech](https://play.brewser.tech).
+3. Selecting an app fetches its bundle and boots it in a fresh, isolated
+   JavaScript context.
+4. The app renders through the GPU-accelerated graphics stack and gets access
+   to input, audio, and any hardware APIs its manifest declares.
+
+Each app runs in its own context — leaving an app fully tears down its
+graphics state, audio nodes and event listeners, so apps can't leak into each
+other.
+
+## What this section covers
+
+- [Architecture](/docs/runtime/architecture) — the engine stack under the hood
+- [Web platform support](/docs/runtime/web-platform) — which standards work
+- [Graphics](/docs/runtime/graphics) — Canvas 2D, WebGL 1 and WebGL 2
+- [Input & sensors](/docs/runtime/input-and-sensors) — gamepad, touch, motion
+- [Hardware APIs](/docs/runtime/hardware-apis) — serial, Bluetooth, MIDI, NFC
