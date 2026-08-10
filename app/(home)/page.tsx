@@ -109,16 +109,16 @@ export default function HomePage() {
             brewser.tech
           </a>
           <a
-            href="https://play.brewser.tech"
+            href="https://brewser.tech/submit/"
             className="transition-colors hover:text-fd-foreground"
           >
-            App catalogue
+            Submit an app
           </a>
           <a
-            href="https://github.com/natureglass"
+            href="https://github.com/natureglass/Brewser-apps"
             className="inline-flex items-center gap-1.5 transition-colors hover:text-fd-foreground"
           >
-            GitHub
+            Apps on GitHub
             <ArrowRight className="size-3.5 -rotate-45" />
           </a>
         </footer>
