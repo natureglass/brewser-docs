@@ -3,6 +3,11 @@ import Link from 'next/link';
 export default function HomePage() {
   return (
     <div className="flex flex-col justify-center text-center flex-1 px-4">
+      <img
+        src="https://raw.githubusercontent.com/natureglass/Brewser/refs/heads/main/romfs/shell/assets/Brewser_logo.png"
+        alt="Brewser logo"
+        className="mx-auto mb-6 h-32 w-auto"
+      />
       <h1 className="text-3xl font-bold mb-4">Brewser Documentation</h1>
       <p className="mb-6 text-fd-muted-foreground">
         Everything about the Brewser web runtime — how it works, how to build
