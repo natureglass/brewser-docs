@@ -9,12 +9,14 @@ export default function HomePage() {
         alt="Brewser logo"
         width={BrewserLogo.width}
         height={BrewserLogo.height}
-        className="mx-auto mb-6 h-32 w-auto"
+        className="mx-auto mb-6 h-32 w-auto rounded-[50%]"
       />
       <h1 className="text-3xl font-bold mb-4">Brewser Documentation</h1>
       <p className="mb-6 text-fd-muted-foreground">
-        Everything about the Brewser web runtime — how it works, how to build
-        for it, and how to publish your apps.
+        Brewser is an online platform for creators, tinkerers, and developers<br />
+        a curiosity-driven playground for sharing your ideas and projects with the world.<br />
+        If you`ve ever built something clever and then watched it vanish into the void,<br />
+        ...you`re exactly who we made this for.
       </p>
       <p>
         <Link

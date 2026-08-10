@@ -29,6 +29,6 @@ export function baseOptions(): BaseLayoutProps {
         </span>
       ),
     },
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+    githubUrl: `https://github.com/${gitConfig.user}/Brewser`,
   };
 }
