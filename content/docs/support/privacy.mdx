@@ -1,0 +1,63 @@
+---
+title: Privacy & Your Data
+description: What Brewser stores, why, and how to remove it
+---
+
+This page explains what Brewser stores when you use accounts and cloud features. Brewser is
+operated from the EU and aims to keep to the spirit of the GDPR: collect little, be clear about it,
+and let you delete it.
+
+If you never sign in, Brewser stores no personal account data about you — you can browse and run
+apps signed out. The rest of this page is about what happens once you do sign in.
+
+## Sign-in
+
+Accounts are **Google-backed** — you sign in with Google, and Brewser never sees or stores a
+password. Sign-in is verified against Google directly (OpenID Connect); the only third-party network
+involved in authentication is Google's own endpoints.
+
+To recognise you across sessions and devices, Brewser stores your **Google account identifier** (the
+"subject" id Google issues). This links your saves, leaderboard entries and achievements to you.
+
+> **Reconciliation flag.** The [Accounts](/docs/features/accounts) page currently summarises this as
+> "only a salted hash … not your email address in plain form." In the current data model, some
+> records (cloud saves, leaderboard entries, and **publisher profiles**) store the account
+> identifier directly, and a publisher profile stores your email. This page reflects that model;
+> the two should be reconciled before launch. (Recorded in `OPEN_QUESTIONS.md §A3`.)
+
+## What's stored, by feature
+
+| Feature | What's stored |
+| --- | --- |
+| **Cloud saves** | Your save data for each app, linked to your account. Only you can read your own saves; an app only ever sees its own save box. |
+| **Leaderboards** | The score and the display name you submit, linked to your account. Leaderboards are public — other players see your name and score. |
+| **Achievements** | Which badges you've earned. |
+| **Favourites & ratings** | Which apps you've favourited or rated. |
+| **Publisher profile** (if you publish) | The profile you create: display name, username, email, and anything you add — website, bio, donation link, avatar — plus your submission history. |
+| **Donations** | Only a link you choose to show. **No payment details ever touch Brewser** — donating happens entirely on the service you link to. |
+
+Anonymous, non-personal counts (an app's total downloads and ratings) are also kept, but they
+aren't tied to your identity.
+
+## Deleting your data
+
+Several things you can remove yourself, today:
+
+- **A cloud save** — an app can clear its own cloud save for you.
+- **A leaderboard entry** — you can remove your own entry from a board.
+- **Ideas / comments** you posted on the [Ideas Board](/docs/features/ideas-board).
+- **A published app** — you can unpublish or delete your submissions from the dashboard.
+
+> **DECISION NEEDED:** a formal **retention period**, a single **"delete my account and all my
+> data"** path, and a **contact for data requests** (GDPR access/erasure) are not yet defined in
+> code. This page drafts them as: *"To delete your account and associated data, contact
+> [privacy@brewser.tech] and we'll action it within 30 days."* Confirm the contact address and the
+> commitment, or provide your own wording. (Recorded in `OPEN_QUESTIONS.md §B4`.)
+
+{/* TODO(verify): confirm the DSAR contact address and retention/erasure policy before launch. */}
+
+## Related
+
+- [Accounts & Sign-in](/docs/features/accounts) — how sign-in works.
+- [Saves & Leaderboards](/docs/features/saves-and-leaderboards) — the cloud features.
+- [Legal & Attributions](/docs/support/legal).
