@@ -1,0 +1,88 @@
+---
+title: Debugging & Testing
+description: The Chrome-first loop, and what you can and can't see on the console
+---
+
+Brewser apps are standard web apps, which shapes the whole debugging story: **your fastest,
+richest debugging happens in Chrome**, and the console is where you confirm device-specific
+behaviour.
+
+## Debug in Chrome first
+
+DevTools, breakpoints, the console, the network panel, hot reload — none of that exists on the
+Switch, but all of it exists in a desktop browser, and Brewser implements the same standard APIs.
+So the loop is:
+
+1. Build and debug in Chrome with full DevTools.
+2. Move to Brewser only to check things Chrome can't tell you: real input, real performance,
+   hardware, and any [runtime gaps](/docs/support/limitations).
+
+Treat the console as a verification target, not an edit-refresh loop.
+
+## What you can see on the console
+
+Not much, deliberately — and this surprises people, so plan for it:
+
+- **`console.log`, `console.info` and `console.warn` do nothing in the release build.** Only
+  `console.error` survives.
+- `console.error` output is written to a **log file on the SD card**:
+  `sdmc:/switch/nxjs-debug.log`. Pull the SD card (or read it over FTP/your CFW's tools) to see it.
+- There is **no on-screen console** and **no built-in FPS or debug overlay**.
+- An **uncaught error** stops the app: the screen holds its last frame and the log gets the error.
+  Press **+** to exit back out.
+
+> Because `console.log` is silent on-device, don't rely on it for on-console debugging. Use
+> `console.error` for anything you need in the log file, or — better — surface state in your own
+> UI (see below).
+
+## Techniques that work on-device
+
+- **Build your own debug HUD.** A `<div>` you update with state, or a debug overlay you toggle with
+  a button, is the most reliable way to see what's happening on the console. The
+  [Sensors Playground](https://play.brewser.tech) app (`com.natureglass.sensorsplayground`) is a
+  good example — every reading is drawn straight to the screen.
+- **Measure your own FPS.** There's no overlay, so time your frames with `requestAnimationFrame`
+  and render the number yourself:
+
+  ```js
+  let last = performance.now(), frames = 0;
+  (function tick(now) {
+    frames++;
+    if (now - last >= 1000) { showFps(frames); frames = 0; last = now; }
+    requestAnimationFrame(tick);
+  })(performance.now());
+  ```
+
+- **Fail loudly in the UI.** Wrap risky init in `try/catch` and paint the error to the screen — far
+  easier than fishing it out of the log file.
+
+## Testing on real hardware before you publish
+
+You don't have to test on-device before submitting, but you can sideload freely. Drop your app
+into Brewser's apps folder:
+
+```text
+sdmc:/switch/brewser/apps/com.you.myapp/
+  index.html
+  ...
+```
+
+The folder name is the app id, and an entry file is all you need — **no manifest, no approval, no
+signing**. Launch Brewser and it appears with your downloaded apps.
+
+> If you've seen references to a `/switch/brewser/local-apps/` folder, use
+> `sdmc:/switch/brewser/apps/<id>/` instead — that's the path Brewser actually scans.
+
+{/* TODO(verify): local-apps/ is referenced in older brewser-apps docs but is unimplemented in the runtime; apps/<id>/ is the real sideload path. Reconcile the brewser-apps docs. */}
+
+## Reporting what you find
+
+If something works in Chrome but misbehaves on Brewser, that's exactly the kind of report the
+project wants — see [Getting Help](/docs/support). A minimal HTML/JS repro plus "here's what Chrome
+does" is perfect.
+
+## Related
+
+- [Performance](/docs/tips/performance) — making apps fast on Tegra X1.
+- [Developing on an Emulator](/docs/tips/emulator) — a secondary check between Chrome and hardware.
+- [Troubleshooting](/docs/support/troubleshooting) — when an app won't start.
