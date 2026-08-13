@@ -1,0 +1,79 @@
+---
+title: Audio & Media
+description: Web Audio, audio and video elements, and the codecs that actually decode
+---
+
+Brewser has real audio and video support — Web Audio for synthesis and analysis, `<audio>` and
+`<video>` elements for playback, and a broad set of codecs. The main thing to keep in mind is that
+media decoding runs in **software**, so codec *coverage* is wide but *performance* has limits.
+
+## Web Audio
+
+The core of the Web Audio API is real and hardware-backed. These nodes work as you'd expect:
+
+- `AudioContext` / `OfflineAudioContext`, `AudioDestinationNode`
+- `GainNode`, `StereoPannerNode`, `AudioBufferSourceNode`, `OscillatorNode`
+- **`AnalyserNode`** — real time/frequency data, so spectrum visualisers work
+- `AudioParam` automation and `decodeAudioData`
+
+Some less-common nodes are shimmed for compatibility so capability-probing apps don't crash: filter,
+convolver and panner nodes pass audio through unprocessed, and a few others (delay, compressor,
+wave-shaper, script processor) are present but inert. `connect()` is lenient — an unsupported
+connection is a no-op rather than a thrown error — so libraries that build large graphs keep
+working. Build your core sound on the real nodes above and you're on solid ground.
+
+**`new Audio()` works** for sound effects and music (whole-file decode).
+
+## `<audio>` and `<video>` elements
+
+HTML `<audio>` and `<video>` elements play through the runtime's media pipeline. `canPlayType()`
+answers honestly, returning `"maybe"` for the container/codec combinations it can decode.
+
+Media can come from local files, blobs, and the network — including **HLS streams** over HTTPS (see
+[Networking](/docs/runtime/networking)).
+
+## Codec support
+
+Decoding is done in software (via FFmpeg), so the codec list is broad. What's limited is **frame
+rate at high resolutions** — 1080p, and modern codecs like VP9 and AV1, are heavier than the
+Tegra X1 handles comfortably. Prefer H.264 at 720p for smooth video.
+
+### Video
+
+| Codec | Decodes | Notes |
+| --- | --- | --- |
+| H.264 / AVC | ✅ | Best choice; smooth at 720p |
+| H.265 / HEVC | ✅ | Works; HD is performance-limited |
+| VP8 | ✅ | |
+| VP9 | ✅ | Performance-limited |
+| AV1 | ✅ | Performance-limited |
+| MPEG-1/2/4, VC-1, Theora | ✅ | Software-decoded |
+
+### Audio
+
+| Codec | Decodes |
+| --- | --- |
+| MP3 | ✅ |
+| AAC / M4A | ✅ |
+| Ogg Vorbis | ✅ |
+| Opus | ✅ |
+| FLAC | ✅ |
+| WAV / PCM | ✅ |
+| AC3/EAC3, ALAC, WMA | ✅ |
+
+> Video decoding currently runs on the CPU — the hardware video block isn't engaged in this build —
+> which is why high-resolution and next-gen codecs are the practical limit rather than a hard wall.
+
+## See it in action
+
+- **`com.natureglass.spectraplay`** — a Web Audio spectrum visualiser reading an `<audio>` element
+  through an `AnalyserNode`, rendered with WebGL 2.
+- **`com.natureglass.streamcast`** — a `<video>` player pulling a live HLS stream.
+
+Browse them at [play.brewser.tech](https://play.brewser.tech).
+
+## Related
+
+- [Networking in Apps](/docs/runtime/networking) — streaming media over the network.
+- [Performance](/docs/tips/performance) — getting smooth playback on Tegra X1.
+- [Known Limitations](/docs/support/limitations).

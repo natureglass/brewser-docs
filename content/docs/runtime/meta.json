@@ -1,4 +1,4 @@
 {
   "title": "Switch Runtime",
-  "pages": ["index", "architecture", "web-platform", "graphics", "input-and-sensors", "hardware-apis"]
+  "pages": ["index", "architecture", "web-platform", "graphics", "input-and-sensors", "controls", "hardware-apis", "networking", "audio-and-media", "storage"]
 }
