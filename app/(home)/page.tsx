@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Cpu, Plug, Rocket, Upload } from 'lucide-react';
-import BrewserLogo from '@/assets/Brewser_logo.png';
+import BrewserLogo from '@/assets/Brewser_logo_day_small.png';
+import BrewserLogoNight from '@/assets/Brewser_logo_night_small_2.png';
 
 const sections = [
   {
@@ -36,13 +37,20 @@ const sections = [
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col justify-center px-4 py-16">
-      <div className="mx-auto w-full max-w-3xl rounded-lg border border-[#e6e6f0] bg-white px-10 py-5 text-center shadow-[0_0_15px_0_rgba(0,0,0,0.06)]">
+      <div className="mx-auto w-full max-w-3xl rounded-lg border border-[#e6e6f0] bg-white px-10 py-5 text-center shadow-[0_0_15px_0_rgba(0,0,0,0.06)] dark:border-fd-border dark:bg-fd-popover dark:shadow-[0_0_15px_0_rgba(0,0,0,0.35)]">
         <img
           src={BrewserLogo.src}
           alt="Brewser logo"
           width={BrewserLogo.width}
           height={BrewserLogo.height}
-          className="mx-auto mb-6 h-28 w-auto"
+          className="mx-auto mb-6 h-28 w-auto dark:hidden"
+        />
+        <img
+          src={BrewserLogoNight.src}
+          alt="Brewser logo"
+          width={BrewserLogoNight.width}
+          height={BrewserLogoNight.height}
+          className="mx-auto mb-6 hidden h-28 w-auto dark:block"
         />
 
         <h1 className="mb-4 text-4xl font-bold tracking-tight">
