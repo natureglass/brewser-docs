@@ -1,4 +1,4 @@
 {
   "title": "Support & Limitations",
-  "pages": ["index", "limitations", "troubleshooting"]
+  "pages": ["index", "faq", "limitations", "troubleshooting", "roadmap", "changelog", "privacy", "legal", "security-disclosure"]
 }

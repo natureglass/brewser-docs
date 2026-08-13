@@ -1,0 +1,44 @@
+---
+title: Glossary
+description: Homebrew and Brewser terms in plain language
+---
+
+New to Switch homebrew? Here are the terms you'll run into, in plain language.
+
+**Homebrew** — Software made by the community that runs on a device outside its official app store.
+Brewser is homebrew, and it runs web-app homebrew inside itself.
+
+**CFW (Custom Firmware)** — Modified console software that lets homebrew run. On the Switch this is
+usually [Atmosphère](https://github.com/Atmosphere-NX/Atmosphere). Brewser requires CFW.
+
+**Atmosphère** — The most common Switch custom firmware. If your console runs Atmosphère, it can run
+Brewser.
+
+**NRO** — The file format for Switch homebrew apps (`.nro`). Brewser ships as an NRO you place in the
+`/switch/` folder on your SD card. See [Installing](/docs/getting-started/installing).
+
+**hbmenu (Homebrew Menu)** — The launcher that lists your installed homebrew NROs. You start Brewser
+from here.
+
+**sysNAND** — Your console's built-in system storage — the "real" system.
+
+**emuNAND / emuMMC** — An *emulated* copy of the system stored on your SD card, kept separate from
+your sysNAND. Many people run homebrew from an emuMMC to isolate it from their clean system. See the
+[FAQ](/docs/support/faq) on ban risk.
+
+**Tegra X1** — The NVIDIA chip inside the Switch. Brewser's runtime is tuned for it; it's capable but
+a 2015-era mobile part, which is why [performance](/docs/tips/performance) matters.
+
+**nx.js** — The open-source JavaScript-for-Switch project Brewser's runtime is built on (heavily
+extended). See [Architecture](/docs/runtime/architecture).
+
+**Manifest** — The small JSON file describing a Brewser app — its name, id, and the capabilities it
+declares. See the [Manifest Reference](/docs/publishing/manifest).
+
+**The catalogue** — Brewser's in-app store of published web apps, at
+[play.brewser.tech](https://play.brewser.tech). See [The Catalogue](/docs/features/catalogue).
+
+## Related
+
+- [Installing & Updating](/docs/getting-started/installing)
+- [FAQ](/docs/support/faq)

@@ -1,4 +1,4 @@
 {
   "title": "Hints & Tips",
-  "pages": ["index", "performance", "unity"]
+  "pages": ["index", "debugging", "performance", "unity", "emulator"]
 }

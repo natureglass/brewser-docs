@@ -1,0 +1,72 @@
+---
+title: Legal & Attributions
+description: Trademark disclaimer and open-source notices
+---
+
+## Not affiliated with Nintendo
+
+**Brewser is an independent homebrew project and is not affiliated with, endorsed by, sponsored by,
+licensed by, or approved by Nintendo.** "Nintendo Switch" and related marks are trademarks of
+Nintendo. Brewser does not include, distribute, or provide Nintendo software, firmware, games,
+ROMs, encryption keys, copyrighted assets, exploits, or tools for bypassing technological protection
+measures. You are responsible for complying with applicable laws and third-party terms.
+
+## Open-source attributions
+
+Brewser's runtime is built from production-grade open-source components. We're grateful to the
+projects below and reproduce their license notices as an obligation, not an afterthought.
+
+> The table below is an accurate component-and-license inventory. Full license texts for all bundled
+> components are available on request via [brewser.tech](https://brewser.tech).
+
+### Engine & core
+
+| Component | Role | License |
+| --- | --- | --- |
+| [nx.js](https://nxjs.n8.io) (Brewser fork) | Base runtime | MIT |
+| V8 | JavaScript engine | BSD-3-Clause |
+| Skia (+ skcms/skshaper/skunicode) | 2D rendering | BSD-3-Clause |
+| Mesa / Nouveau, libdrm | OpenGL ES driver stack (bundled) | MIT |
+| Abseil | C++ support library | Apache-2.0 |
+| libnx | Switch system library | ISC |
+
+### Media, imaging & networking
+
+| Component | Role | License |
+| --- | --- | --- |
+| FFmpeg (avcodec/avformat/swscale/swresample/avutil) | Audio/video decoding | LGPL-2.1+ (or GPL-2.0+) † |
+| dav1d | AV1 decoding | BSD-2-Clause |
+| Mbed TLS | TLS | Apache-2.0 |
+| FreeType | Font rasterisation | FTL / GPLv2 |
+| HarfBuzz | Text shaping | MIT |
+| libjpeg-turbo | JPEG | IJG / BSD-3-Clause / zlib |
+| libpng | PNG | libpng License |
+| libwebp | WebP | BSD-3-Clause |
+| zlib, zstd, bzip2 | Compression | zlib / BSD-3-Clause / bzip2 |
+| ada | URL parsing | Apache-2.0 OR MIT |
+| libuv | Async I/O | MIT |
+
+### Fonts, data & bundled libraries
+
+| Component | Role | License |
+| --- | --- | --- |
+| Geist Mono | UI font | SIL OFL-1.1 |
+| Twemoji | Emoji artwork | CC-BY 4.0 |
+| Mozilla CA bundle | TLS root certificates | MPL-2.0 |
+| css-tree, mdn-data, source-map-js | CSS tooling | MIT / CC0-1.0 / BSD-3-Clause |
+| web-streams-polyfill, @xmldom/xmldom, and other bundled npm libraries | Runtime polyfills | MIT (and, for `color-space`, the Unlicense) |
+| Nayuki QR generator (clean-room port) | QR codes | MIT |
+
+† FFmpeg's exact license (LGPL-2.1+ vs GPL-2.0+) depends on the build flags used for the Switch
+port; this is being confirmed (see `OPEN_QUESTIONS.md §C1`).
+
+Native system libraries provided by the devkitPro toolchain (newlib, libstdc++/libgcc) are used
+under their respective licenses (the GCC runtime library carries the GCC Runtime Library Exception).
+
+> **Note:** Brewser's JavaScript runs on **V8**. Earlier prototypes used QuickJS and wasm3; these
+> were removed in favour of V8 and are **not** part of the shipped runtime.
+
+## Related
+
+- [Architecture](/docs/runtime/architecture) — where these components fit.
+- [Privacy & Your Data](/docs/support/privacy).

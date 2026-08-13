@@ -1,0 +1,67 @@
+---
+title: Installing & Updating Brewser
+description: Getting Brewser onto your Switch, and how updates stay trustworthy
+---
+
+Brewser runs as a homebrew application on a Nintendo Switch with custom firmware
+([Atmosphère](https://github.com/Atmosphere-NX/Atmosphere)). If your console isn't hacked yet,
+start with the [NH Switch Guide](https://switch.hacks.guide/) — Brewser needs nothing beyond a
+standard Atmosphère setup.
+
+## What you need
+
+- A Switch running custom firmware (Atmosphère). Any model that runs Atmosphère works — see the
+  [FAQ](/docs/support/faq) for the model rundown.
+- An SD card with a little free space.
+- A network connection, to load the [catalogue](/docs/features/catalogue) and sign in. Most apps
+  run fully offline once downloaded.
+
+## Install
+
+1. Download the Brewser `.nro` from [brewser.tech](https://brewser.tech).
+2. Copy it into the `/switch/` folder on your SD card. The Homebrew Menu lists any `.nro` it
+   finds there.
+3. Put the SD card back in your Switch.
+
+Brewser keeps all of its own files under `sdmc:/switch/brewser/` — the catalogue cache, your
+downloaded apps (`apps/<id>/`), and app storage. You don't need to create any of that by hand;
+Brewser sets it up on first launch.
+
+## First launch
+
+1. Open the Homebrew Menu and launch **Brewser**.
+2. The [catalogue](/docs/features/catalogue) loads from
+   [play.brewser.tech](https://play.brewser.tech).
+3. Browse, pick an app, and it downloads and boots in its own isolated context.
+4. Signing in is optional — you only need a [Brewser account](/docs/features/accounts) for cloud
+   [saves, leaderboards](/docs/features/saves-and-leaderboards) and achievements. Sign-in uses a
+   short device code you enter on your phone or computer.
+
+New to the terminology (NRO, hbmenu, emuMMC)? The [Glossary](/docs/getting-started/glossary) has
+you covered.
+
+## Updating — and why you can trust it
+
+Brewser updates itself from within the app. Updates matter for a homebrew app that talks to your
+account and your hardware, so the updater is built to be safe by construction:
+
+- **Every update is cryptographically signed** (ECDSA P-256). Brewser verifies the signature
+  against a built-in key *before* it reads a single field of the update — an unsigned or tampered
+  update is refused outright.
+- **The download is hash-checked in full.** The new build is hashed in chunks and compared against
+  the signed manifest before anything is installed. A corrupted download can't be applied.
+- **Updates only ever move forward.** Brewser refuses to "update" to an older build, even a
+  correctly-signed one, so an old version can't be replayed onto your console.
+- **Your data is never touched.** The updater can only write to Brewser's own program files — your
+  saves, app storage and settings are off-limits to it by design.
+- **A power cut mid-update won't brick Brewser.** The new build is staged and verified, then swapped
+  in with a two-step hand-off that can recover on the console itself, with no PC required.
+
+When an update is available you'll see an **Update Brewser** prompt. It downloads, verifies, and
+restarts ("Restarting Brewser… Do not power off"). That's it — no manual file swapping.
+
+## Related
+
+- [How the runtime works](/docs/runtime) — what happens when you launch an app.
+- [Troubleshooting](/docs/support/troubleshooting) — if an app won't start.
+- [FAQ](/docs/support/faq) — models, ban risk, cost, and "is this piracy?".

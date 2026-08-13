@@ -1,0 +1,85 @@
+---
+title: Content & Submission Policy
+description: What Brewser accepts, what it rejects, and how to pass the scanner
+---
+
+Brewser is a curated catalogue reviewed by a maintainer, with an automated
+[security scan](/docs/publishing/security-review) on every submission. This page covers what's
+allowed, what isn't, and how to keep your code from getting flagged.
+
+## Allowed
+
+Brewser is for web-powered apps and experiments — and tools count as much as games:
+
+- HTML / CSS / JavaScript apps, WebGL demos, WASM apps
+- Utilities, dashboards, hardware tools, media players, visualisers
+- Games and demos built with web technology
+- Apps that use the network, with their hosts clearly declared
+
+## Not allowed
+
+Do not submit apps that include, link to, or provide:
+
+- Nintendo software, firmware, ROMs, game dumps, or encryption keys
+- Copyrighted or trademarked assets you don't have the right to use (game art, logos, branding)
+- Piracy tools, exploit chains, or instructions for bypassing protection measures
+- Malware, credential theft, hidden telemetry, or undisclosed tracking
+- **Obfuscated code intended to hide behaviour**
+- Content that impersonates official companies, platforms, games, or services
+- Sexual, pornographic, or gratuitously violent adult content
+
+If your app is an unofficial client or wrapper for a third-party service, say so plainly, and don't
+imply it's official. Be careful with names, icons and branding from companies like Nintendo,
+Twitch, YouTube, Discord or Spotify.
+
+The maintainer reviews manually and may accept, reject, reclassify (e.g. move to the Experimental
+channel with stronger warnings), or request changes at their discretion, to protect users and the
+project.
+
+## How not to trip the security scanner
+
+Every submission is statically analysed before it can be published. The scanner isn't judging your
+app's quality — it's looking for patterns that hide malicious behaviour. **Normal, readable code
+passes.** You can avoid almost every false flag by following a few habits:
+
+- **Ship readable code.** Don't minify or obfuscate. Heavy obfuscation (encoded string arrays,
+  `String.fromCharCode` payload reconstruction, packed bundles) is itself a flag, because it's how
+  malware hides. If you use a bundler, prefer readable output and skip the mangling pass.
+- **Avoid `eval` and friends.** `eval`, `new Function(...)`, `setTimeout("code string", …)`, and
+  computed dynamic `import()` are all flagged — especially if the code they run comes from `atob`,
+  a network response, or `String.fromCharCode`. Decoding data and then executing it is the single
+  strongest danger signal.
+- **Use literal URLs and API names.** Reaching the network through an assembled string
+  (`window['fe' + 'tch']`, `location['hos' + 'tname']`) or a computed property looks like evasion.
+  Write `fetch('https://api.example.com/…')` plainly.
+- **Declare every external host** in [`allowed_origins`](/docs/publishing/manifest). A request to a
+  host you didn't declare is flagged as unexpected egress.
+- **Stay in your own storage.** Reading another app's `localStorage` keys, enumerating databases,
+  or reading `localStorage['brewser_auth']` are all flagged — the last one hard, if the value then
+  leaves the device.
+- **Declare the hardware you use.** Calling `navigator.usb`/`bluetooth` without declaring the
+  matching permission is flagged.
+- **Don't gate code on time, host, or randomness.** A network call hidden behind `Date.now() > …`,
+  `location.hostname === …`, or `Math.random()` reads as a time-bomb.
+- **Don't vendor `node_modules`** or smuggle code inside assets (a script hidden in an SVG, data
+  appended after an image's end marker).
+
+Embedding large base64 assets (textures, fonts) is fine on its own — it's only a concern if that
+data is then decoded and executed.
+
+### Verdicts
+
+| Verdict | What it means for you |
+| --- | --- |
+| **GOOD** | No known-bad patterns; eligible to publish. |
+| **SUSPICIOUS** | Something needs a human look before publishing — often just obfuscation or an undeclared host. |
+| **DANGEROUS** | A clear malicious pattern; publication is blocked. |
+
+A `DANGEROUS` verdict blocks publication. See [Security Review](/docs/publishing/security-review)
+for how the scan works under the hood.
+
+## Related
+
+- [Security Review](/docs/publishing/security-review) — the scanner in detail.
+- [Manifest Reference](/docs/publishing/manifest) — declaring permissions and hosts.
+- [Submitting Your App](/docs/publishing/submission) — the submission flow.

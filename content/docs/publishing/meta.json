@@ -1,4 +1,4 @@
 {
   "title": "Publishing",
-  "pages": ["index", "submission", "manifest", "security-review", "updates"]
+  "pages": ["index", "quickstart", "submission", "manifest", "policy", "security-review", "updates"]
 }
