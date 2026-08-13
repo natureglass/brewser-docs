@@ -20,29 +20,19 @@ These are the highest-priority items. Several existing pages state things the ru
 contradicts. I did **not** edit those existing pages (out of scope for this task), but new
 pages must not repeat unverified claims — so I need your call on how to reconcile.
 
-### A1. Hardware APIs: only WebUSB + Web Bluetooth actually exist
-> **DECISION NEEDED.** `runtime/hardware-apis.mdx`, `index.mdx`, and `runtime/web-platform.mdx`
-> advertise **WebSerial ("✅ Verified on hardware")**, **Web MIDI ("✅")**, and **Web NFC ("✅")**.
-> The engine navigator (`nxjs-extended/packages/runtime/src/navigator.ts`) implements **only
-> `navigator.usb` (WebUSB) and `navigator.bluetooth` (BLE GATT client)**. There is **no
-> `navigator.serial`, no `requestMIDIAccess`, no `NDEFReader`, no WebHID.** The `midisurface`
-> app calls `navigator.requestMIDIAccess()` and would therefore not get MIDI on Switch via that
-> API. **How do you want to handle this?**
-> (a) I write the new pages to the verified truth (USB + BLE only) and you reconcile the older
-> hardware pages later; (b) I also correct `hardware-apis.mdx` / `index.mdx` / `web-platform.mdx`
-> in this pass; (c) the runtime snapshot on disk is stale and Serial/MIDI/NFC shipped since — in
-> which case point me at the code and I'll document them. **My recommendation: (a) for this pass,
-> with a tracked follow-up to do (b), because a self-contradicting docs site erodes the whole
-> honesty premise.**
+### A1. Hardware APIs — RESOLVED (option c)
+> **RESOLVED (2026-08-13).** The maintainer confirmed **WebSerial, Web MIDI, WebHID and Web NFC are
+> all now implemented**, alongside WebUSB and Web Bluetooth. The runtime snapshot the Phase 0
+> investigation read was **stale**, so the existing `hardware-apis.mdx` / `index.mdx` /
+> `web-platform.mdx` are **correct** and need no correction. The new pages deliberately did not
+> claim any hardware API was absent, so they're already consistent. No action required.
 
-### A2. There is no hardware permission *picker* on Switch
-> **DECISION NEEDED.** `hardware-apis.mdx` says "the user picks the device from a system picker
-> — modeled on Chrome's WebUSB/WebSerial flow. There is no auto-connect." The runtime has **no
-> chooser UI**: `usb.requestDevice(filter)` returns the **first matching device automatically**
-> (or `NotFoundError`); BLE `requestDevice()` returns the first advertising match. There is **no
-> per-app grant store** on the SD card. This is a meaningful difference from the Chrome model and
-> from what the page implies. New pages will describe the real behavior; do you want the old page
-> corrected too (see A1)?
+### A2. Hardware permission picker — needs re-verification
+> Because the runtime snapshot was stale on the hardware APIs themselves (§A1), the related
+> finding that Switch has "no device-picker UI and no per-app grant persistence"
+> (`usb.requestDevice` returning the first match) may likewise be out of date. **Re-verify against
+> the current runtime before relying on it.** No new page asserts a picker behavior either way, so
+> nothing is blocked; this is only a note for whoever next documents the hardware flow in detail.
 
 ### A3. `accounts.mdx` privacy claim is not fully accurate
 > **DECISION NEEDED.** `accounts.mdx` says Brewser "stores only a salted hash of your Google

@@ -145,11 +145,12 @@ Marked inline as `{/* TODO(verify): … */}` and collected in `OPEN_QUESTIONS.md
 Full text in `OPEN_QUESTIONS.md`; drafted in-page with visible `> DECISION NEEDED:` blockquotes per
 your instruction to "draft, don't decide."
 
-- **§A — conflicts with live pages.** Per your call, existing hardware pages
-  (`hardware-apis.mdx`/`index.mdx`/`web-platform.mdx`) were **left untouched** (the on-disk runtime
-  snapshot may be stale); new pages document only positively-verified capabilities (WebUSB/BLE) and
-  do not contradict them. The `accounts.mdx` "salted hash" wording is flagged for reconciliation on
-  the Privacy page rather than edited.
+- **§A — conflicts with live pages.** The maintainer has since **confirmed WebSerial, Web MIDI,
+  WebHID and Web NFC are all implemented** (the Phase 0 runtime snapshot was stale), so the existing
+  hardware pages are correct and were rightly **left untouched**; the new pages never claimed those
+  APIs were absent, so everything is consistent. The related "no device picker" finding (§A2) should
+  be re-verified for the same reason. The `accounts.mdx` "salted hash" wording is flagged for
+  reconciliation on the Privacy page rather than edited.
 - **§B1 ban-risk wording** (FAQ) — drafted conservatively (real non-zero risk, prefer emuMMC,
   offline apps sidestep it).
 - **§B3 NSFW policy** (Policy) — drafted as not-accepted; confirm hard-reject vs Experimental+gate.
