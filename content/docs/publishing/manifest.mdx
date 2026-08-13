@@ -1,37 +1,123 @@
 ---
-title: Manifest & Permissions
-description: Declaring what your app needs
+title: Manifest Reference
+description: Every field in a Brewser app manifest, and how it's generated
 ---
 
-Every Brewser app ships a manifest describing its identity and the hardware
-capabilities it needs.
+Every Brewser app ships a `manifest.json` describing its identity, the capabilities it needs, and
+how it should behave on the console. This page is the field-by-field reference.
 
-## Why declare permissions?
+## You don't hand-write it — Brewser generates it
 
-Users see the required capabilities **before** launching your app, and the
-runtime only exposes the hardware APIs you declared. Combined with the
-runtime device picker, this means no app ever silently accesses hardware.
+Here's the part that trips people up: **you never author the published manifest by hand.** You fill
+in the [submission form](/docs/publishing/submission) on brewser.tech, and Brewser builds a
+validated `manifest.json` from your answers. The manifest below is what comes *out* of that
+process and ships inside your app on the SD card — it's useful to understand, but the form is where
+you actually set these values.
 
-## Declarable capabilities
+The submission side validates every field against a strict schema (unknown fields are rejected), so
+a malformed manifest can't reach the catalogue.
 
-- `serial` — WebSerial (USB CDC devices such as ESP32/Arduino)
-- `bluetooth` — WebBluetooth
-- `midi` — Web MIDI
-- `nfc` — Web NFC
-- `usb` — WebUSB
+## A real manifest, annotated
 
-{/* TODO: paste the canonical manifest JSON schema + a full example once
-frozen */}
+This is the generated manifest for the [Save Demo](https://play.brewser.tech) app
+(`com.natureglass.savedemo`), lightly annotated:
+
+```json
+{
+  "id": "com.natureglass.savedemo",   // reverse-domain id: com.<publisher>.<app>
+  "name": "Save Demo",                 // shown in the catalogue
+  "version": "1.0.0",                  // semver
+  "description": "<p>...</p>",          // rich text (a small HTML allowlist)
+  "summary": "A hands-on test harness for the Brewser save & leaderboard APIs.",
+  "logo": "assets/appbanner.jpg",      // relative path inside your bundle
+  "entry": "index.html",               // the first file Brewser opens
+  "categories": ["Apps", "Demos"],     // one or more catalogue categories
+  "permissions": [],                    // declared capabilities (see below)
+  "compatibility": ["switch", "web"],  // where the app is meant to run
+  "allowed_origins": [],                // external hosts the app may reach
+  "developer": "Alex Daskalakis",      // your publisher display name
+  "license": "MIT",
+  "tags": ["Leaderboards", "Save Game"],
+  "exitGame": "PLUS",                  // controller button that exits the app
+  "fullscreen": true,                   // app owns the whole screen
+  "hideMouseDocked": false,             // software-cursor behaviour, docked
+  "hideMouseUndocked": false,           //   ... and handheld
+  "publishedAt": "2026-08-06T10:20:30Z" // set once, on first publish
+}
+```
+
+## Field reference
+
+| Field | Required | Type | Notes |
+| --- | --- | --- | --- |
+| `id` | Yes | string | `com.<publisher>.<app>`, lowercase. Stable — don't change it between versions. |
+| `name` | Yes | string | User-facing name. Don't impersonate other products. |
+| `version` | Yes | string | Semantic version, e.g. `1.2.0`. |
+| `description` | Yes | string | Rich text with a small HTML allowlist (`p`, `br`, `strong`, `em`, `ul`/`ol`/`li`, `code`, `a`). |
+| `summary` | No | string | Short one-liner (≤100 chars) for cards. |
+| `logo` | Yes | string | Relative path to your icon/banner inside the bundle. |
+| `entry` | Yes | string | The first file Brewser opens. Defaults to `index.html`; must exist in the bundle. |
+| `categories` | Yes | string[] | One or more catalogue categories. |
+| `permissions` | Yes | string[] | Declared capabilities — see [below](#permissions). May be empty. |
+| `compatibility` | Yes | string[] | Where the app runs: `switch`, `web`, `mobile`. |
+| `allowed_origins` | Yes | string[] | External `https?://` hosts the app is allowed to reach. Empty if it makes no network calls. |
+| `developer` | Yes | string | Your publisher display name. |
+| `license` | Yes | string | An SPDX-style license id (MIT, Apache-2.0, GPL-3.0, …). |
+| `exitGame` | Yes | string | The controller button that exits the app (see [Controls](/docs/runtime/controls)). |
+| `fullscreen` | Yes | boolean | Whether the app takes over the whole screen. |
+| `hideMouseDocked` / `hideMouseUndocked` | No | boolean | Software-cursor visibility per dock state. |
+| `freshProcessOnExit` | No | boolean | Ask the runtime for a clean context on exit. |
+| `publishedAt` | Yes | string | ISO timestamp, set once at first publish and carried forward. |
+| `tags` | No | string[] | Free-form tags for discovery. |
+| `genre` / `features` | No | string[] | Curated genre and feature labels. |
+| `buttonMapping` | No | object | Maps keyboard keys to Switch controls — see [Controls](/docs/runtime/controls). |
+
+> Field values like `categories`, `license`, `genre` and `features` are validated against curated
+> lists on the platform, so the form offers you the valid choices rather than free text.
+
+## Permissions
+
+`permissions` is a list of the capabilities your app declares up front. Users see them **before**
+launching, and the runtime uses them to decide what your app may touch — network access, local
+storage, device info, account access, and so on. Requesting a capability your app doesn't use just
+adds friction, so **declare the minimum you need**. Apps that request nothing skip the permission
+prompt entirely and offer the smoothest click-to-play experience.
+
+Hardware access (USB, Bluetooth, and the other device APIs covered in
+[Hardware APIs](/docs/runtime/hardware-apis)) is declared here too. Declaring a peripheral says
+*"this app talks to hardware of this kind"*; choosing a **specific** device — filtering by USB
+vendor/product id, or by Bluetooth service UUID — happens in your app's own `requestDevice()` call,
+exactly as it does in Chrome. Those filters live in your JavaScript, not in the manifest.
+
+> The exact set of permission names is a curated list maintained by Brewser, so it can grow over
+> time. If your app needs a capability you don't see offered, mention it in your submission.
+
+{/* TODO(verify): enumerate the live brewser_permission taxonomy term list once frozen; observed slugs on disk include storage, device_info, network, usb */}
+
+### Network needs two things
+
+If your app reaches the internet, it needs both a network capability **and** every external host
+listed in `allowed_origins`:
+
+```json
+"allowed_origins": [
+  "https://api.example.com",
+  "https://cdn.example.com"
+]
+```
+
+The security scanner cross-checks the hosts your code actually contacts against this list — an
+undeclared host is flagged. See [Networking in Apps](/docs/runtime/networking) for what the runtime
+can reach, and [Security Review](/docs/publishing/security-review) for how the check works.
 
 ## What doesn't need declaring
 
-Permissions are only for **hardware** capabilities. Platform features like
-[Saves & Leaderboards](/docs/features/saves-and-leaderboards) need nothing in
-the manifest — they work through the `brewser.js` SDK and only depend on the
-user being [signed in](/docs/features/accounts) for their cloud parts.
+Platform features like [Saves & Leaderboards](/docs/features/saves-and-leaderboards) need **nothing**
+in the manifest — they're not hardware. They work through the [`brewser.js` SDK](/docs/features/brewser-sdk)
+and only depend on the user being [signed in](/docs/features/accounts) for their cloud parts.
 
-## Best practice
+## Related
 
-Declare the minimum you need. Apps requesting no hardware access at all skip
-the permission prompt entirely and offer the smoothest click-to-play
-experience.
+- [Quickstart](/docs/publishing/quickstart) — where these values get filled in.
+- [Content & Submission Policy](/docs/publishing/policy) — what's allowed.
+- [Controls](/docs/runtime/controls) — `exitGame` and `buttonMapping`.

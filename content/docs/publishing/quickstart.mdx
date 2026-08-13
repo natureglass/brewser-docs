@@ -1,0 +1,115 @@
+---
+title: "Quickstart: Your First App"
+description: One HTML file, from Chrome to the Brewser catalogue
+---
+
+If you can write an HTML file, you can publish a Brewser app. There's no SDK to learn, no
+toolchain to install, and no `brewser.*` API you're forced to use — a Brewser app is just a web
+app. This page takes one file all the way to the catalogue.
+
+## 1. Write it
+
+Make a folder with a single `index.html`:
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hello Brewser</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #101018; color: #fff;
+        font: 600 6vw system-ui, sans-serif; }
+      main { height: 100%; display: grid; place-items: center; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div>
+        Hello, Switch 👋
+        <p id="count" style="font-size: 4vw; opacity: .7">Press A</p>
+      </div>
+    </main>
+    <script>
+      // Gamepad works out of the box — A is button 0 (Nintendo layout).
+      let n = 0, pressed = false;
+      (function loop() {
+        const gp = navigator.getGamepads?.()[0];
+        const a = !!gp && gp.buttons[0].pressed;
+        if (a && !pressed) document.getElementById('count').textContent = `A pressed ${++n}×`;
+        pressed = a;
+        requestAnimationFrame(loop);
+      })();
+    </script>
+  </body>
+</html>
+```
+
+## 2. Test it in Chrome
+
+Open the file in a desktop browser. **This is your real development loop** — Brewser implements
+standard web APIs, so if it works in Chrome it will almost certainly work on the Switch. Iterate
+here; it's a hundred times faster than deploying to the console.
+
+Plug in a gamepad to exercise the input path, or just click around. When you're happy, you're
+ready to ship.
+
+> **Big touch/click targets, gamepad-first.** You're building for a TV and a controller. Assume no
+> mouse, make targets large, and always provide a gamepad path — [touch only works in handheld
+> mode](/docs/runtime/input-and-sensors). See [Controls](/docs/runtime/controls).
+
+## 3. (Optional) Try it on real hardware
+
+You don't have to test on-device before submitting, but you can. Brewser runs any app you drop
+into its apps folder:
+
+```text
+sdmc:/switch/brewser/apps/com.you.hello/
+  index.html
+```
+
+The folder name **is** the app id (reverse-domain style, `com.you.hello`). Launch Brewser and it
+appears alongside your downloaded apps.
+
+> **Heads up:** on-device `console.log` is silent in the release build — only `console.error`
+> reaches the log file. Plan your on-device debugging accordingly; see
+> [Debugging & Testing](/docs/tips/debugging). You do **not** need a
+> [manifest](/docs/publishing/manifest) file for a local sideload — the folder and an entry file
+> are enough.
+
+## 4. Submit it
+
+When you're ready for the catalogue, head to the publisher dashboard on
+[brewser.tech](https://brewser.tech/submit/) and sign in with Google:
+
+- Give it a **name**, **id**, **description**, **category**, and an **icon**.
+- Declare any hardware/network access it needs (the hello-world above needs none).
+- Upload your app as a **zip** bundle. Keep it lean — small apps are faster to review, faster to
+  download, and boot quicker on the console.
+
+You fill in a form; Brewser **generates the manifest for you** from what you enter. You never
+hand-write the published manifest — see the [Manifest Reference](/docs/publishing/manifest) for
+what ends up in it.
+
+## 5. Watch the pipeline
+
+After you submit, the dashboard shows your app's status as it moves through the
+[GitHub-backed pipeline](/docs/publishing/submission):
+
+| You'll see | What it means |
+| --- | --- |
+| **Waiting for review** | Submitted; queued for the maintainer. |
+| **Deployed to staging. Awaiting review** | Built, scanned, and live on staging for testing. |
+| **Published in the Brewser catalog** | Approved — it's live at [play.brewser.tech](https://play.brewser.tech). |
+| **Rejected: …** | Not accepted; the reason comes with it. |
+
+Every submission is scanned automatically before it can be published — writing clean, readable
+code keeps that pass smooth. See [Security Review](/docs/publishing/security-review) and the
+[Content & Submission Policy](/docs/publishing/policy).
+
+## Where to go next
+
+- [Manifest Reference](/docs/publishing/manifest) — every field, and how it's generated.
+- [`brewser.js` SDK](/docs/features/brewser-sdk) — add cloud saves and leaderboards.
+- [Hints & Tips](/docs/tips) — build apps that feel great on the couch.
