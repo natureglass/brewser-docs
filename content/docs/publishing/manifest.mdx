@@ -23,6 +23,13 @@ runtime device picker, this means no app ever silently accesses hardware.
 {/* TODO: paste the canonical manifest JSON schema + a full example once
 frozen */}
 
+## What doesn't need declaring
+
+Permissions are only for **hardware** capabilities. Platform features like
+[Saves & Leaderboards](/docs/features/saves-and-leaderboards) need nothing in
+the manifest — they work through the `brewser.js` SDK and only depend on the
+user being [signed in](/docs/features/accounts) for their cloud parts.
+
 ## Best practice
 
 Declare the minimum you need. Apps requesting no hardware access at all skip
