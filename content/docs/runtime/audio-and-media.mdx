@@ -4,8 +4,9 @@ description: Web Audio, audio and video elements, and the codecs that actually d
 ---
 
 Brewser has real audio and video support — Web Audio for synthesis and analysis, `<audio>` and
-`<video>` elements for playback, and a broad set of codecs. The main thing to keep in mind is that
-media decoding runs in **software**, so codec *coverage* is wide but *performance* has limits.
+`<video>` elements for playback, and a broad set of codecs. Audio and video play back well across
+the formats below; because decoding runs in **software**, the one thing to watch is very
+high-bandwidth video, which can stutter.
 
 ## Web Audio
 
@@ -34,9 +35,10 @@ Media can come from local files, blobs, and the network — including **HLS stre
 
 ## Codec support
 
-Decoding is done in software (via FFmpeg), so the codec list is broad. What's limited is **frame
-rate at high resolutions** — 1080p, and modern codecs like VP9 and AV1, are heavier than the
-Tegra X1 handles comfortably. Prefer H.264 at 720p for smooth video.
+Playback works well for the formats below. Decoding is done in software (via FFmpeg), so the codec
+list is broad and the practical limit is **bandwidth**: high-bitrate or high-resolution video —
+1080p, and heavier codecs like VP9 and AV1 — can drop frames on the Tegra X1. Prefer H.264 at 720p
+for the smoothest video.
 
 ### Video
 
@@ -61,8 +63,9 @@ Tegra X1 handles comfortably. Prefer H.264 at 720p for smooth video.
 | WAV / PCM | ✅ |
 | AC3/EAC3, ALAC, WMA | ✅ |
 
-> Video decoding currently runs on the CPU — the hardware video block isn't engaged in this build —
-> which is why high-resolution and next-gen codecs are the practical limit rather than a hard wall.
+> Video decodes on the CPU (the hardware video block isn't engaged in this build), so a very
+> high-bandwidth stream is the most likely thing to stutter — not any particular codec. In testing,
+> everything plays; only high-bandwidth video suffers.
 
 ## See it in action
 

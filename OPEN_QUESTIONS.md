@@ -27,22 +27,17 @@ pages must not repeat unverified claims — so I need your call on how to reconc
 > `web-platform.mdx` are **correct** and need no correction. The new pages deliberately did not
 > claim any hardware API was absent, so they're already consistent. No action required.
 
-### A2. Hardware permission picker — needs re-verification
-> Because the runtime snapshot was stale on the hardware APIs themselves (§A1), the related
-> finding that Switch has "no device-picker UI and no per-app grant persistence"
-> (`usb.requestDevice` returning the first match) may likewise be out of date. **Re-verify against
-> the current runtime before relying on it.** No new page asserts a picker behavior either way, so
-> nothing is blocked; this is only a note for whoever next documents the hardware flow in detail.
+### A2. Hardware permission picker — RESOLVED
+> **RESOLVED (2026-08-13).** The maintainer confirmed the **hardware permission picker is active and
+> working**. The stale-snapshot finding ("no device-picker UI") was wrong. The existing
+> `hardware-apis.mdx` description of a system picker is correct; no new page needs changing.
 
-### A3. `accounts.mdx` privacy claim is not fully accurate
-> **DECISION NEEDED.** `accounts.mdx` says Brewser "stores only a salted hash of your Google
-> subject ID — never your password, and not your email address in plain form." In the plugin
-> schema, the **developers, saves, and leaderboards tables store the raw Google `sub`**, and the
-> **developers table stores `email` in plain form** (`class-brewser-sub-schema.php`). Only ideas /
-> favorites / ratings store `SHA-256(sub)`. The new **Privacy & Your Data** page will state the
-> real picture. Do you want me to (a) leave `accounts.mdx` as-is and let the Privacy page be the
-> authoritative source, or (b) also correct the `accounts.mdx` sentence? **Recommendation: (b) —
-> it's a factual privacy claim and should match the schema.**
+### A3. `accounts.mdx` privacy claim — RESOLVED (corrected)
+> **RESOLVED (2026-08-13).** Per the maintainer, `accounts.mdx` was **corrected**: it no longer
+> claims "only a salted hash … not your email address in plain form." It now states that Brewser
+> stores your Google account identifier (and, for publishers, your email + display name) and links
+> to **Privacy & Your Data**, which matches the plugin schema. The Privacy page's reconciliation
+> note was removed accordingly.
 
 ### A4. "Video codec support is limited" understates reality
 `limitations.mdx` has `{/* TODO: document exact codec/decoder status */}`. Verified: the codec

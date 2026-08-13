@@ -16,6 +16,12 @@ Hard-won practical advice for building great Brewser apps.
    console.
 4. **Handle both input worlds.** Touch works only in handheld mode; always
    provide a gamepad path.
+5. **Make offline a priority.** Network access is regulated and not trusted by
+   default — design your app to work fully offline, and treat connectivity as a
+   bonus rather than a requirement.
+6. **Stay self-contained.** Strive for zero external dependencies: bundle every
+   asset and library your app needs instead of fetching them at runtime.
+   Self-contained apps are faster, more reliable, and pass review more smoothly.
 
 Deep dives:
 

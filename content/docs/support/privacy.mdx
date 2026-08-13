@@ -17,13 +17,9 @@ password. Sign-in is verified against Google directly (OpenID Connect); the only
 involved in authentication is Google's own endpoints.
 
 To recognise you across sessions and devices, Brewser stores your **Google account identifier** (the
-"subject" id Google issues). This links your saves, leaderboard entries and achievements to you.
-
-> **Reconciliation flag.** The [Accounts](/docs/features/accounts) page currently summarises this as
-> "only a salted hash … not your email address in plain form." In the current data model, some
-> records (cloud saves, leaderboard entries, and **publisher profiles**) store the account
-> identifier directly, and a publisher profile stores your email. This page reflects that model;
-> the two should be reconciled before launch. (Recorded in `OPEN_QUESTIONS.md §A3`.)
+"subject" id Google issues). This links your saves, leaderboard entries and achievements to you. If
+you publish apps, your developer profile also stores your email and display name. See
+[Accounts & Sign-in](/docs/features/accounts) for the sign-in side.
 
 ## What's stored, by feature
 
