@@ -140,26 +140,30 @@ Marked inline as `{/* TODO(verify): … */}` and collected in `OPEN_QUESTIONS.md
 
 ---
 
-## 5. Decisions awaiting the maintainer
+## 5. Decisions — all RESOLVED
 
-Full text in `OPEN_QUESTIONS.md`; drafted in-page with visible `> DECISION NEEDED:` blockquotes per
-your instruction to "draft, don't decide."
+Every reserved decision has been finalized (maintainer: "resolve and merge"); the visible
+`DECISION NEEDED` blockquotes were removed from the pages. Full record in `OPEN_QUESTIONS.md`.
 
-- **§A — RESOLVED.** The maintainer confirmed **all hardware Web APIs (WebSerial, Web MIDI, WebHID,
-  Web NFC, plus USB/Bluetooth) are implemented and the permission picker is active** — the Phase 0
-  runtime snapshot was stale — so the existing hardware pages are correct and were rightly left
-  untouched. `accounts.mdx` was **corrected** to state the real data model (Google account
-  identifier stored; email + display name for publishers) and link to the Privacy page; the Privacy
-  page's reconciliation note was removed. Audio/Media was reworded per the maintainer: everything
-  tested plays; only very high-bandwidth video suffers.
-- **§B1 ban-risk wording** (FAQ) — drafted conservatively (real non-zero risk, prefer emuMMC,
-  offline apps sidestep it).
-- **§B3 NSFW policy** (Policy) — drafted as not-accepted; confirm hard-reject vs Experimental+gate.
-- **§B4 privacy retention / deletion / DSAR contact** (Privacy) — drafted with a placeholder
-  contact and 30-day commitment; confirm.
-- **§B6 security-disclosure contact** (Security Disclosure) — placeholder; confirm.
-- **§B7 license-text reproduction** (Legal) — accurate component/license table now; full upstream
-  texts flagged as in-progress.
+- **§A — RESOLVED.** All hardware Web APIs (WebSerial, Web MIDI, WebHID, Web NFC, USB, Bluetooth) are
+  implemented and the permission picker is active (the Phase 0 snapshot was stale); existing hardware
+  pages left untouched. `accounts.mdx` corrected to the real data model; Privacy reconciliation note
+  removed. Audio/Media reworded (everything tested plays; only very high-bandwidth video suffers).
+- **§B1 ban risk** (FAQ) — conservative stance published: real non-zero risk, prefer emuMMC, most
+  apps run offline to sidestep it.
+- **§B2 offline positioning** — made the recommended safe path (FAQ + a new Golden rule).
+- **§B3 NSFW** (Policy) — listed as **not accepted**.
+- **§B4 privacy retention / deletion** (Privacy) — data kept only while the account is active,
+  nothing sold/shared; per-resource deletion via the dashboard; full-account deletion via
+  brewser.tech within 30 days.
+- **§B5 emulator page** — included.
+- **§B6 security-disclosure contact** (Security Disclosure) — private report to the maintainer via
+  brewser.tech.
+- **§B7 attributions** (Legal) — accurate license table published; full texts available on request.
+
+Remaining `TODO(verify)` items (§C — e.g. exact FFmpeg license, `.nro` URL now pointing at
+brewser.tech, runtime version to seed the changelog) stay as **invisible** inline `{/* */}` notes;
+they don't render on the site and don't block launch.
 
 ---
 
