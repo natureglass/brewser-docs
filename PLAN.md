@@ -30,7 +30,7 @@ final **`REPORT.md`** with `path:line` citations.
   picker; codecs broad-but-software; storage per-profile; CORS bypassed; forward-only signed
   self-update; `local-apps/` sideload is unimplemented). See `OPEN_QUESTIONS.md §A`.
 
-**Canonical apps** (real IDs, all catalogue-linkable at `https://play.brewser.tech`), chosen as
+**Canonical apps** (real IDs, all catalogue-linkable at `https://play.brewser.io`), chosen as
 "see it in action" references and preferring Switch-compatible titles:
 
 | Capability | App id | Notes |
@@ -92,8 +92,8 @@ Requires CFW (Atmosphère); links NH Switch Guide.
 Written for the "skill floor just below developer." One hello-world `index.html` (a runnable,
 Chrome-testable snippet) → test in Chrome → (optionally) sideload to
 `sdmc:/switch/brewser/apps/<id>/` for a real-device check → submit via the dashboard on
-brewser.tech (Google sign-in) → watch pipeline status (the real developer-visible states:
-`pending → approved`, or `rejected`/`staging`) → live at play.brewser.tech. Honest about the
+brewser.io (Google sign-in) → watch pipeline status (the real developer-visible states:
+`pending → approved`, or `rejected`/`staging`) → live at play.brewser.io. Honest about the
 zip-bundle format and "keep it lean."
 *Sources:* pipeline stages + visible states (platform §3), sideload reality (runtime §7),
 manifest generation (platform §1). *Apps:* references `savedemo` and `nxjswebgl1test` as

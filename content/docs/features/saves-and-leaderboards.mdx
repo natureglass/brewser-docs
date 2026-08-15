@@ -203,7 +203,7 @@ this order:
 1. A token you handed in via `brewser.configure({ token })`.
 2. `window.__brewserAuthToken()`, exposed by the navigator.
 3. A `postMessage` of `{ type: 'brewser-token', token }` from the Brewser origin
-   (`brewser.tech` / `play.brewser.tech`), which the SDK listens for.
+   (`brewser.io` / `play.brewser.io`), which the SDK listens for.
 
 Signed out, saves are still instant and local and will sync once the user signs
 in; leaderboard `list()` still works. Use `brewser.canSync()` to reflect state in
@@ -234,7 +234,7 @@ brewser.configure({
 | `packageId` | auto from URL | Identifies your app's save box & board. |
 | `token` | — | Hand in an auth token explicitly. |
 | `onSync` | `null` | Sync-status callback (see above). |
-| `apiBase` | `https://brewser.tech/wp-json/brewser/v1` | Save/leaderboard API root. |
+| `apiBase` | `https://brewser.io/wp-json/brewser/v1` | Save/leaderboard API root. |
 | `nsPrefix` | `brewser_save_` | localStorage key prefix. |
 | `pushDebounceMs` | `1500` | Delay before a background push coalesces writes. |
 

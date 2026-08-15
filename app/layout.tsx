@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import './global.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://docs.brewser.tech'),
+  metadataBase: new URL('https://docs.brewser.io'),
   title: {
     template: '%s | Brewser Docs',
     default: 'Brewser Docs',

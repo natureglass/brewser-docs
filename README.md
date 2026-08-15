@@ -1,8 +1,8 @@
 # Brewser Docs
 
-Documentation site for [Brewser](https://brewser.tech), built with
+Documentation site for [Brewser](https://brewser.io), built with
 [Fumadocs](https://fumadocs.dev) on Next.js — statically exported for
-GitHub Pages at **docs.brewser.tech**.
+GitHub Pages at **docs.brewser.io**.
 
 ## Development
 
@@ -31,7 +31,7 @@ Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds and
 deploys `out/` to GitHub Pages. One-time setup in the repo settings:
 
 1. Settings → Pages → Source: **GitHub Actions**
-2. Settings → Pages → Custom domain: **docs.brewser.tech**
+2. Settings → Pages → Custom domain: **docs.brewser.io**
 3. DNS: add a `CNAME` record for `docs` → `natureglass.github.io`
 
 ## TODO markers

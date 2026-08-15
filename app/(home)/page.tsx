@@ -111,13 +111,13 @@ export default function HomePage() {
 
         <footer className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-fd-muted-foreground">
           <a
-            href="https://brewser.tech"
+            href="https://brewser.io"
             className="transition-colors hover:text-fd-foreground"
           >
-            brewser.tech
+            brewser.io
           </a>
           <a
-            href="https://brewser.tech/submit/"
+            href="https://brewser.io/submit/"
             className="transition-colors hover:text-fd-foreground"
           >
             Submit an app

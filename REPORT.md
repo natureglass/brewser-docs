@@ -114,7 +114,7 @@ Phase-0 notes):
 
 ---
 
-## 3. Apps referenced as worked examples (real ids, all at play.brewser.tech)
+## 3. Apps referenced as worked examples (real ids, all at play.brewser.io)
 
 `com.natureglass.savedemo` (SDK/saves/leaderboards), `…sensorsplayground` (sensors, debug-HUD
 pattern), `…spectraplay` (Web Audio + `<audio>`), `…streamcast` (`<video>`/HLS + external net),
@@ -155,14 +155,14 @@ Every reserved decision has been finalized (maintainer: "resolve and merge"); th
 - **§B3 NSFW** (Policy) — listed as **not accepted**.
 - **§B4 privacy retention / deletion** (Privacy) — data kept only while the account is active,
   nothing sold/shared; per-resource deletion via the dashboard; full-account deletion via
-  brewser.tech within 30 days.
+  brewser.io within 30 days.
 - **§B5 emulator page** — included.
 - **§B6 security-disclosure contact** (Security Disclosure) — private report to the maintainer via
-  brewser.tech.
+  brewser.io.
 - **§B7 attributions** (Legal) — accurate license table published; full texts available on request.
 
 Remaining `TODO(verify)` items (§C — e.g. exact FFmpeg license, `.nro` URL now pointing at
-brewser.tech, runtime version to seed the changelog) stay as **invisible** inline `{/* */}` notes;
+brewser.io, runtime version to seed the changelog) stay as **invisible** inline `{/* */}` notes;
 they don't render on the site and don't block launch.
 
 ---

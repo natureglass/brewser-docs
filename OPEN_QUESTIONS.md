@@ -58,10 +58,10 @@ community-standard defaults and the visible `DECISION NEEDED` blockquotes remove
 **B1** conservative ban-risk stance (prefer emuMMC; most apps run offline); **B2** offline made the
 recommended path (FAQ + a new "make offline a priority" Golden rule); **B3** NSFW / adult content
 listed as **not accepted**; **B4** privacy — data kept only while the account is active, nothing
-sold or shared, per-resource deletion via the dashboard, full-account deletion via brewser.tech
+sold or shared, per-resource deletion via the dashboard, full-account deletion via brewser.io
 within 30 days; **B5** emulator page included; **B6** security reports go privately to the
-maintainer via brewser.tech; **B7** accurate license table published, full texts available on
-request via brewser.tech. The original drafts are kept below for the record.
+maintainer via brewser.io; **B7** accurate license table published, full texts available on
+request via brewser.io. The original drafts are kept below for the record.
 
 ### B1. Ban-risk wording (FAQ)
 > **DECISION NEEDED.** The FAQ must address "can I get banned running this online on CFW?" I will
