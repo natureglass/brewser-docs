@@ -1,0 +1,121 @@
+---
+title: Developing with AI
+description: Point AI assistants at working, hardware-verified reference apps and let them build for the Switch
+---
+
+Brewser apps can be built with the technologies AI assistants know best — plain HTML, JavaScript, and WebGL, no proprietary SDK to learn. That makes Claude, ChatGPT, Copilot, and friends genuinely great at building for the Switch. The trick is to point them at **working, hardware-verified examples** instead of letting them guess. This page shows you exactly how.
+
+**[Browse the reference apps](https://github.com/natureglass/Brewser-apps/tree/main/apps)**
+
+Every app in `Brewser-apps/apps/` is live in the catalogue and runs on real Switch hardware.
+
+## Why this works so well
+
+AI models hallucinate when they have to guess at a platform's quirks. Brewser removes the guesswork: every published app lives in one public repository, in one self-contained folder, following one consistent structure. Give your assistant a reference app to imitate and it has everything it needs — the manifest format, the file layout, the input handling, the lot.
+
+| | | |
+|---|---|---|
+| **Standard web tech** | **Working references** | **One folder, one app** |
+| *No proprietary SDK* | *Hardware-verified* | *Easy to imitate* |
+| HTML, CSS, JS, WebGL, WASM — the exact stack AI assistants were trained on most. | Every app in the catalogue repo has been tested on a real CFW Switch. Copy what works. | A manifest.json, an index.html, and local assets. Small enough for an AI to hold in context. |
+
+> The catalogue is the documentation — point your AI at a working app, not at a wish.
+
+Below, pick the section that matches what you're building. Each one names the reference apps to imitate and gives you a copy-paste prompt. Swap the **highlighted part** for your own idea, paste it into your assistant of choice, and iterate from there. If your assistant can browse or clone repositories (Claude Code, Cursor, and similar agent tools can), even better — let it read the reference directly.
+
+## Building Three.js demos?
+
+Brewser ships a curated suite of Three.js demos — GPGPU water, unreal bloom, GLTF loading, real-time physics, dynamic cube maps — all running on the console's GPU. They share one structure your AI should follow to the letter: an import map that resolves `three` to `./build/three.module.js` and `three/addons/` to `./jsm/`, with the Three.js build and every addon **vendored locally** inside the app folder. No CDN imports, no bundler, no network at runtime.
+
+**Reference apps:** [threejsgpgpuwater](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.threejsgpgpuwater) · [threejsselectiveunrealbloom](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.threejsselectiveunrealbloom) · [threejsloadergltf](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.threejsloadergltf)
+
+**Copy-paste prompt:**
+
+```
+I'm building a Three.js app for Brewser (https://brewser.io), a homebrew web runtime for Nintendo Switch. Before writing any code, study this working reference and mirror its structure exactly: https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.threejsgpgpuwater — a manifest.json at the root, index.html as the entry, and an import map that resolves "three" to ./build/three.module.js and "three/addons/" to ./jsm/, with the Three.js build and all addons vendored locally in the app folder. No CDN imports, no bundler, no network requests at runtime; every texture and model is a local file. Now build me: [a low-poly floating island with a day/night cycle, orbit controls, and soft bloom]. Target smooth 60 fps at 1280×720, make the controls work with touch, and write a manifest.json using the same fields as the reference.
+```
+
+## Going raw WebGL2 on a canvas?
+
+For shader-driven work — fluids, fractals, metaballs, generative visuals — skip the frameworks entirely. **Fluid Dynamics** is the reference: a full-screen canvas with `getContext('webgl2')`, a chain of shader passes over floating-point textures, and a feature probe that tests which float formats the GPU supports so it degrades gracefully. One HTML file, zero libraries, zero network. This is the leanest, fastest kind of Brewser app there is.
+
+**Reference apps:** [fluiddynamics](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.fluiddynamics) · [fractalzoom](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.fractalzoom) · [metaballssim](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.metaballssim)
+
+**Copy-paste prompt:**
+
+```
+I'm building a raw WebGL2 app for Brewser (https://brewser.io), a homebrew web runtime for Nintendo Switch. Use this working reference as your structural template: https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.fluiddynamics — a single index.html driving a full-screen canvas via getContext('webgl2'), all shaders inline, no external libraries, no network requests, and a startup probe that detects supported float texture formats and falls back gracefully. Keep a manifest.json at the root with the same fields as the reference. Now build me: [a reaction-diffusion simulation I can paint into with my finger, with a colour palette that shifts over time]. It must hold 60 fps at 1280×720 on a Tegra X1-class GPU and support multi-touch input.
+```
+
+## Using the Switch's motion sensors?
+
+The Switch's gyroscope and accelerometer are exposed through the standard `DeviceOrientation` and `DeviceMotion` web events — the same code that reads a phone's tilt reads a Joy-Con's. The **Sensors Playground** app shows the full event surface; **Compass** and **DUSK** show it applied. Declare the `device_info` permission in your manifest and the runtime handles the rest.
+
+**Reference apps:** [sensorsplayground](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.sensorsplayground) · [compass](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.compass) · [dusk](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.dusk)
+
+**Copy-paste prompt:**
+
+```
+I'm building a motion-controlled app for Brewser (https://brewser.io), a homebrew web runtime for Nintendo Switch. Study this working reference and follow its structure and sensor handling: https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.sensorsplayground — it reads the console's gyroscope and accelerometer through the standard DeviceOrientation and DeviceMotion events, declares the "device_info" permission in its manifest.json, and keeps everything in one self-contained folder with no network requests. Now build me: [a marble maze where tilting the console rolls the ball through the level]. Also add touch controls as a fallback so it stays playable in a desktop browser at brewser.io, and target 1280×720 at 60 fps.
+```
+
+## Need save data and leaderboards?
+
+Games that remember things use the tiny **Brewser Save SDK** — a single drop-in `brewser.js` file. Saves are local-first (instant, works offline) and sync to the player's Brewser account in the background, so progress carries between the Switch and the browser. The **Save Demo** app shows the whole API: `brewser.save()` / `brewser.load()` for one-blob saves, plus a record layer (`put`, `get`, `update`, `remove`, `list`) for score tables. Tell your AI to copy the SDK file **unchanged** and only write the game code around it.
+
+**Reference app:** [savedemo](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.savedemo)
+
+**Copy-paste prompt:**
+
+```
+I'm building a game with save data for Brewser (https://brewser.io), a homebrew web runtime for Nintendo Switch. Use this working reference for both the app structure and the save integration: https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.savedemo — copy its brewser.js SDK file into my app folder completely unchanged, and use only its documented API: brewser.save() and brewser.load() for the main save blob, and the record layer (brewser.put / get / update / remove / list) for high scores. Do not modify the SDK, its apiBase, or invent new endpoints; saves are local-first and sync in the background when the player is signed in. Keep a manifest.json at the root matching the reference's fields. Now build me: [an endless-runner mini game that saves the player's best distance and shows a personal top-10 run history], playable with touch and gamepad at 1280×720.
+```
+
+## Porting a Unity WebGL game?
+
+Unity's standard WebGL export runs on Brewser — WASM, JIT and all. The **2D Platformer Microgame** is the packaging reference: the export's `Build/` and `TemplateData/` folders sit next to `index.html` and `manifest.json`, with **compression disabled** in Unity's publishing settings so the runtime loads the `.data`, `.wasm`, and loader files directly. Your AI's job here isn't the game — Unity already built that — it's wiring the export into a clean, reviewable Brewser app folder.
+
+**Reference app:** [2dplatformermicrogame](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.2dplatformermicrogame)
+
+**Copy-paste prompt:**
+
+```
+I have a Unity WebGL export and want to package it as an app for Brewser (https://brewser.io), a homebrew web runtime for Nintendo Switch. Use this working reference as the packaging template: https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.2dplatformermicrogame — the Unity export's Build/ and TemplateData/ folders live at the app root next to index.html and manifest.json, the export uses uncompressed files (compression disabled in Unity's WebGL publishing settings, so plain .data / .wasm / .framework.js / .loader.js), and the manifest declares the "storage" permission. Walk me through: [adapting my export "SpaceMiner" — the right Unity export settings, the loader config in index.html, a manifest.json with sensible fields, and making the canvas fill a 1280×720 16:9 screen with gamepad input]. Everything must load locally with no CDN or network requests.
+```
+
+## Talking to hardware — MIDI and beyond?
+
+This is where Brewser gets properly weird, in the best way: plug a MIDI controller into the Switch's USB port and a web app can talk to it through the standard `navigator.requestMIDIAccess()` API. **MIDI Surface** is the reference — it declares the `usb` permission in its manifest, detects connected controllers, and runs identically on Switch, desktop, and mobile from the same code.
+
+**Reference app:** [midisurface](https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.midisurface)
+
+**Copy-paste prompt:**
+
+```
+I'm building a hardware-connected app for Brewser (https://brewser.io), a homebrew web runtime for Nintendo Switch where MIDI devices plugged into the console's USB port are reachable via the standard Web MIDI API. Study this working reference and follow its structure: https://github.com/natureglass/Brewser-apps/tree/main/apps/com.natureglass.midisurface — it uses navigator.requestMIDIAccess(), declares the "usb" permission in its manifest.json, handles device hot-plugging, and keeps everything in one self-contained folder with no CDN or network requests. Now build me: [a pad sampler that maps the 8 pads of an AKAI LPD8 to drum sounds, with an on-screen fallback grid for touch]. It should work the same on the Switch and in a desktop browser at brewser.io, at 1280×720.
+```
+
+## Ground rules to give your AI
+
+Whatever you're building, these constraints keep an app Switch-ready. Paste them into your assistant's system prompt or project instructions and it'll get things right on the first try far more often:
+
+- ✅ Everything vendored locally — no CDNs, no runtime network calls
+- ✅ manifest.json at the root, index.html as the entry
+- ✅ Design for a 16:9 console screen — 1280×720 handheld
+- ✅ Touch first, gamepad friendly — no hover-only or keyboard-only UI
+- ✅ Declare permissions honestly — device_info, storage, usb
+- ✅ Keep DOM UI flat — solid fills render fastest on the console
+- ✅ Test in a desktop browser first — the same app runs at brewser.io
+- ✅ Ship a README and a clear license, like every catalogue app does
+
+Full manifest reference, permission model, and submission requirements live at [docs.brewser.io](https://docs.brewser.io/) — worth handing to your AI alongside the reference app.
+
+---
+
+Your AI writes the code, the reference apps keep it honest, and real Switch hardware is the final judge. When it runs, submit it — and your app joins the catalogue the next person's AI learns from.
+
+**[Submit your app](https://brewser.io/submit/)** · **[Browse the reference apps](https://github.com/natureglass/Brewser-apps/tree/main/apps)**
+
+---
+
+*Brewser runs on Nintendo Switch consoles with custom firmware. It is an independent homebrew project and is not affiliated with or endorsed by Nintendo.*
