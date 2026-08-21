@@ -1,0 +1,62 @@
+---
+title: On-screen Keyboards
+description: The HTML overlay used for text entry
+---
+
+When you tap a text field or the URL bar, Brewser shows an on-screen keyboard
+overlay driven by the controller. Like the toolbar, each keyboard is an **HTML
+file**, so its layout and look are fully yours. Keyboards are listed in
+`themes/keyboards.json`, and the picker is in **Settings → Keyboard**.
+
+```json title="themes/keyboards.json"
+[
+  { "title": "Dark",      "path": "themes/keyboards/dark.html" },
+  { "title": "Light",     "path": "themes/keyboards/light.html" },
+  { "title": "Neon",      "path": "themes/keyboards/neon.html" },
+  { "title": "WindowsXP", "path": "themes/keyboards/windowsxp.html" }
+]
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `title` | Yes | The name shown in the picker. |
+| `path` | Yes | The keyboard HTML file, relative to `sdmc:/switch/brewser/`. |
+
+The choice is stored as the entry's *path* in `config.json`'s `keyboard` key.
+
+## How a keyboard works
+
+Brewser paints your HTML into a panel across the bottom of the screen and
+handles the input for you — you supply the **layout**, the shell handles key
+presses, focus movement and text entry. In practice that means:
+
+- Lay the keyboard out as **rows of keys** using flexbox. The panel is sized to
+  the configured height, and the shipped keyboards let each row and key grow to
+  fill it (`flex: 1`), so the layout scales to any height.
+- Use a **transparent `body`** so the page you're typing into stays visible
+  behind the keyboard; the shipped themes make the key panel semi-transparent
+  for the same reason.
+- The panel height is set by `config.json`'s `keyboardHeight` (in pixels,
+  clamped 120–700), so design the layout to fill `100vh` rather than assuming a
+  fixed size.
+
+The simplest way to make your own is to copy a shipped keyboard
+(`themes/keyboards/dark.html` is a good base — it's heavily commented), restyle
+the keys, and register it:
+
+```json
+{ "title": "My Keys", "path": "themes/keyboards/my-keys.html" }
+```
+
+Then pick **My Keys** in **Settings → Keyboard**, Save.
+
+> **Start from a shipped file.** The key markup and row structure are wired to
+> the shell's input handling, so it's far quicker to recolour an existing
+> keyboard than to build one from scratch. Focus on the CSS — background,
+> borders, key colours, fonts — and leave the structure intact.
+
+## Related
+
+- [Controls](/docs/runtime/controls) — how text entry and the on-screen
+  keyboard are driven by the controller.
+- [Customize Brewser](/docs/customize) — selecting themes and the update caveat.

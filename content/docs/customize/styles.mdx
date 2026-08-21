@@ -1,0 +1,87 @@
+---
+title: Styles
+description: The CSS that colours and lays out the shell's own pages
+---
+
+A **style** is the stylesheet applied to Brewser's own pages — the home page,
+the app catalogue, Settings, and the built-in dialogs. Styles are listed in
+`themes/styles.json`, and each one is a single CSS file. The picker lives in
+**Settings → Style**.
+
+```json title="themes/styles.json"
+[
+  { "title": "Dark",      "path": "themes/styles/dark.css" },
+  { "title": "Amber",     "path": "themes/styles/amber.css" },
+  { "title": "Neon",      "path": "themes/styles/neon.css" },
+  { "title": "WindowsXP", "path": "themes/styles/windowsxp.css" }
+]
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `title` | Yes | The name shown in the picker. |
+| `path` | Yes | The CSS file, relative to `sdmc:/switch/brewser/`. |
+
+The selected file is served as the shell's page stylesheet, so whatever you put
+in it styles every shell page at once. The choice is stored as the entry's
+*path* in `config.json`'s `brewserStyle` key.
+
+## Writing a style
+
+The quickest route is to copy a shipped style and recolour it:
+
+1. Duplicate `themes/styles/dark.css` as `themes/styles/my-theme.css`.
+2. Change the colours and fonts to taste (see the skeleton below).
+3. Add an entry to `styles.json`:
+   ```json
+   { "title": "My Theme", "path": "themes/styles/my-theme.css" }
+   ```
+4. Pick **My Theme** in **Settings → Style**, Save.
+
+A minimal style only needs to set the body and a few text colours — everything
+else inherits:
+
+```css title="themes/styles/my-theme.css"
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 28px 48px;
+  /* Keep the body transparent so the selected wallpaper shows through.
+     A solid colour here would paint over your background. */
+  background: transparent;
+  color: #e6e6e6;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+  font-size: 18px;
+}
+
+h1 { color: #ffcc66; }   /* page titles   */
+h2 { color: #7aa2ff; }   /* section heads */
+a  { color: #7eda9f; }   /* links         */
+```
+
+### Things to keep in mind
+
+- **Keep `body` transparent** if you want your [wallpaper](/docs/customize/backgrounds)
+  to be visible — the shell paints the background behind the page, and a solid
+  body colour hides it.
+- **Style and wallpaper are independent.** Changing the Style doesn't change the
+  Background and vice-versa, so a dark CSS theme can sit over any wallpaper.
+- **Favour flat colours over gradients and shadows.** The shell is composited on
+  a low-end GPU path where gradients, box-shadows and transitions are expensive;
+  the shipped styles deliberately use flat fills to stay smooth. See
+  [Performance](/docs/tips/performance).
+- **A broken path is skipped**, and if the whole style can't load the shell
+  falls back to its baked-in default, so a typo can't leave you with an unstyled
+  screen.
+
+The shipped styles (`dark`, `amber`, `neon`, `windowsxp`) are heavily commented
+and make good starting points.
+
+## Related
+
+- [Backgrounds & shaders](/docs/customize/backgrounds) — the wallpaper that
+  sits behind your styled pages.
+- [Toolbars](/docs/customize/toolbars) — the browser chrome is styled by its
+  own HTML file, separately from the page style.

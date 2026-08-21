@@ -1,0 +1,120 @@
+---
+title: Backgrounds & Shaders
+description: Static wallpapers and animated fragment-shader wallpapers
+---
+
+The wallpaper behind the shell is set by `themes/backgrounds.json`, a list of
+selectable backgrounds. Each entry is one option in **Settings → Background**.
+There are two kinds: a **static image**, or a **dynamic** wallpaper you write as
+a WebGL fragment shader.
+
+```json title="themes/backgrounds.json"
+[
+  { "title": "None",      "background": "" },
+  { "title": "Windows11", "background": "themes/backgrounds/Windows11.png" },
+  { "title": "Aurora",    "background": "", "dynamic": "themes/backgrounds/aurora.frag" }
+]
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `title` | Yes | The name shown in the picker; also how the choice is stored (`themeBackground`). |
+| `background` | — | Path to a static wallpaper image (`.png`/`.jpg`). |
+| `dynamic` | — | Path to an animated fragment shader (`.frag`). Takes precedence over `background`. |
+
+Paths are relative to `sdmc:/switch/brewser/`, so `themes/backgrounds/x.png`
+resolves to `sdmc:/switch/brewser/themes/backgrounds/x.png`. The "no wallpaper"
+option is just an entry with empty fields, conventionally titled `None`.
+
+## Adding a static wallpaper
+
+The easy one:
+
+1. Copy your image into `themes/backgrounds/` — say `sunset.png`.
+2. Add an entry to `backgrounds.json`:
+   ```json
+   { "title": "Sunset", "background": "themes/backgrounds/sunset.png" }
+   ```
+3. Launch Brewser, open **Settings → Background**, pick **Sunset**, Save.
+
+That's the whole job. Use a 1280×720 image to match the screen.
+
+## Writing an animated wallpaper (shader)
+
+A dynamic wallpaper is a single **WebGL 1 fragment shader**. Brewser draws a
+full-screen triangle for you and runs your shader once per pixel, every frame.
+You get exactly **two uniforms**:
+
+```glsl
+uniform vec2  res;   // drawable size in pixels
+uniform float t;     // seconds elapsed since this wallpaper was selected
+```
+
+Read the pixel position from `gl_FragCoord.xy` and write the colour to
+`gl_FragColor`. That's the entire contract.
+
+> **This is *not* ShaderToy.** There is no `iTime`, `iResolution`, `iMouse` or
+> mouse input. If you're porting a ShaderToy shader, replace `iResolution.xy`
+> with `res`, `iTime` with `t`, and `fragCoord` with `gl_FragCoord.xy`.
+
+Here's a complete, working example — a soft animated gradient:
+
+```glsl title="themes/backgrounds/waves.frag"
+// Guard precision for the Switch's GPU compiler.
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
+uniform vec2  res;
+uniform float t;
+
+void main() {
+  // 0..1 across the screen
+  vec2 uv = gl_FragCoord.xy / res;
+
+  // two slow-moving colour bands
+  float wave = 0.5 + 0.5 * sin(uv.x * 6.0 + t)
+                   * cos(uv.y * 4.0 - t * 0.7);
+
+  vec3 a = vec3(0.05, 0.10, 0.30);   // deep blue
+  vec3 b = vec3(0.60, 0.20, 0.55);   // magenta
+  vec3 col = mix(a, b, wave);
+
+  gl_FragColor = vec4(col, 1.0);
+}
+```
+
+Register it and select it exactly like a static image:
+
+```json
+{ "title": "Waves", "background": "", "dynamic": "themes/backgrounds/waves.frag" }
+```
+
+### Tips for shaders on the Switch
+
+The console's Tegra X1 is a 2015-era mobile GPU, and the shader runs for every
+pixel of a 720p screen every frame — so keep it cheap:
+
+- **Guard the precision** with the `#ifdef` block above; some shaders won't
+  compile without it.
+- **Avoid heavy per-pixel loops** (multi-octave noise, long ray marches). The
+  shipped `aurora.frag` is a good study: it keeps a rich look with a single
+  noise call per band and no loops.
+- **Prefer sines and cheap math** over `pow`/`sqrt` where you can.
+- If a shader fails to compile, Brewser falls back to the entry's static
+  `background` image, then to a solid colour — so nothing breaks, you just don't
+  see your shader. Test in a desktop WebGL sandbox first (using `res`/`t` in
+  place of the ShaderToy uniforms).
+
+The three shaders that ship with Brewser — `aurora.frag`, `galaxy.frag` and
+`xmb-waves.frag` — live in `themes/backgrounds/` and are the best reference to
+copy from.
+
+## Related
+
+- [Customize Brewser](/docs/customize) — the themes folder and how selection
+  works (and the update caveat).
+- [Styles](/docs/customize/styles) — the shell page CSS uses a transparent
+  body so the wallpaper shows through behind it.

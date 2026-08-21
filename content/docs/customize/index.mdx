@@ -1,0 +1,97 @@
+---
+title: Customize Brewser
+description: Make the shell yours — wallpapers, styles, toolbars, cursors and keyboards
+---
+
+Almost everything the Brewser shell shows you — the wallpaper behind the home
+page, the colours and fonts, the browser toolbar, the mouse cursors and the
+on-screen keyboard — is driven by **plain files on your SD card**. There's no
+rebuild, no toolchain, and no code to compile: drop in an image, edit a CSS
+file, or add one line to a JSON list, and the change shows up the next time you
+launch.
+
+This section is a breakdown of what you can change and how.
+
+## The themes folder
+
+On first launch Brewser copies its built-in look to your SD card. From then on
+it reads everything from there, so this folder is the one place you customise:
+
+```
+sdmc:/switch/brewser/themes/
+├── backgrounds.json     ← list of selectable wallpapers
+├── backgrounds/         ← wallpaper images (.png/.jpg) and shaders (.frag)
+├── styles.json          ← list of selectable page styles
+├── styles/              ← the CSS files
+├── toolbars.json        ← list of selectable toolbars
+├── toolbars/            ← the toolbar HTML files
+├── keyboards.json       ← list of selectable on-screen keyboards
+├── keyboards/           ← the keyboard HTML files
+├── cursors.json         ← maps each cursor shape to an image
+├── cursors/             ← the cursor images (.png/.apng)
+└── assets/              ← toolbar icons, the shell music track, etc.
+```
+
+Each of the five categories works the same way: a `*.json` file is a **list of
+choices**, and each choice points at a file (a CSS file, an HTML file, an image
+or a shader). To add your own, drop the file in the matching subfolder and add
+an entry to the list.
+
+> **Editing the files.** Power the console off, put the SD card in your
+> computer, and edit the files in `switch/brewser/themes/` with any text editor
+> or image tool. If you run an on-device FTP/file-manager homebrew you can edit
+> them in place instead.
+
+## Choosing a theme
+
+You don't have to touch anything to switch between the looks that ship with
+Brewser — open **Settings** in the shell and use the pickers:
+
+| Setting | What it changes |
+| --- | --- |
+| **Style** | The colours and fonts of the shell pages |
+| **Background** | The wallpaper (a static image or an animated shader) |
+| **Toolbar** | The browser chrome strip at the top/bottom |
+| **Keyboard** | The on-screen keyboard overlay |
+
+Your choices are saved to `sdmc:/switch/brewser/configs/config.json`. If you
+prefer to edit that file directly, the keys are `brewserStyle`, `toolbar` and
+`keyboard` (each is the *path* of the entry you want, e.g.
+`themes/styles/dark.css`) and `themeBackground` (the *title* of the background
+entry, e.g. `Aurora`). There is no cursor picker — cursors are configured by
+editing `cursors.json` (see [Cursors](/docs/customize/cursors)).
+
+## What you can change
+
+- **[Backgrounds & shaders](/docs/customize/backgrounds)** — static wallpapers,
+  and animated wallpapers you write as a WebGL fragment shader.
+- **[Styles](/docs/customize/styles)** — the CSS that colours and lays out the
+  shell's own pages.
+- **[Toolbars](/docs/customize/toolbars)** — the HTML for the browser chrome
+  (back/forward/home/URL bar), including where it sits and how tall it is.
+- **[Cursors](/docs/customize/cursors)** — the images used for each mouse
+  cursor shape, with hotspots.
+- **[On-screen keyboards](/docs/customize/keyboards)** — the HTML for the
+  keyboard overlay used for text entry.
+
+## Before you dive in
+
+Two things worth knowing up front:
+
+> **Your edits survive normal reboots, but *not* Brewser updates.** The
+> `themes/` folder is owned by the app: when you install a **new version of
+> Brewser**, the shipped theme files *and the five `*.json` lists* are
+> re-written to their defaults. Normal power-cycles never touch them. So keep a
+> backup of any files you change and any lines you add to the JSON lists, and
+> re-apply them after updating. A brand-new file whose name isn't one Brewser
+> ships (e.g. `styles/my-theme.css`) is left alone on update — but the entry you
+> added to `styles.json` to point at it will be reset, so you'll need to add
+> that line back.
+
+> **A broken entry just gets skipped.** If a JSON file is malformed or an entry
+> points at a file that isn't there, that choice is quietly dropped from the
+> picker rather than crashing the shell — so a typo can't lock you out. If a
+> choice disappears from Settings, check the JSON and the file path.
+
+Ready? Start with [Backgrounds & shaders](/docs/customize/backgrounds) — the
+most fun place to begin.

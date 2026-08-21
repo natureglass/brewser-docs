@@ -1,0 +1,110 @@
+---
+title: Toolbars
+description: The browser chrome strip — buttons, URL bar, position and height
+---
+
+The toolbar is the browser chrome strip: back/forward/reload/home, the bookmark
+star, the URL bar, and the Settings and account buttons. It's a small **HTML
+file**, so you have full control over its layout and look. Toolbars are listed
+in `themes/toolbars.json`, and the picker is in **Settings → Toolbar**.
+
+```json title="themes/toolbars.json"
+[
+  { "title": "Dark",      "path": "themes/toolbars/dark.html",      "height": 64 },
+  { "title": "Light",     "path": "themes/toolbars/light.html",     "height": 64 },
+  { "title": "WindowsXP", "path": "themes/toolbars/windowsxp.html", "height": 64 }
+]
+```
+
+| Field | Required | Meaning |
+| --- | --- | --- |
+| `title` | Yes | The name shown in the picker. |
+| `path` | Yes | The toolbar HTML file, relative to `sdmc:/switch/brewser/`. |
+| `height` | — | Strip height in pixels (clamped 28–200). |
+
+The choice is stored as the entry's *path* in `config.json`'s `toolbar` key.
+
+## How a toolbar works
+
+Brewser paints your HTML into a strip across the top (or bottom) of the screen
+and drives it through a small set of hooks:
+
+- **`data-action` on a button** tells the shell what a tap does. The recognised
+  actions are `back`, `forward`, `reload`, `home`, `star` (bookmark),
+  `address-bar` (opens the keyboard to edit the URL), `settings` and `avatar`.
+- **The shell updates the toolbar for you:** it fills the URL field, swaps the
+  bookmark icon between the bookmarked/not-bookmarked images, greys out
+  back/forward when there's no history, and sets a network-status dot. You just
+  provide the elements and mark them up.
+- **Icons** are ordinary `<img>` tags. The shipped toolbars load them from
+  `sdmc:/switch/brewser/themes/assets/` (e.g. `left.png`, `home.png`,
+  `settings.png`) — drop your own PNGs there and point at them.
+
+A stripped-down toolbar looks like this:
+
+```html title="themes/toolbars/my-bar.html"
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; height: 100vh; display: flex; align-items: center;
+         gap: 8px; padding: 0 12px; background: #101828; color: #e6edf7;
+         font-family: "Segoe UI", Arial, sans-serif; }
+  .btn { width: 44px; height: 44px; border: 0; background: none;
+         display: flex; align-items: center; justify-content: center; }
+  .btn img { width: 28px; height: 28px; }
+  .btn[data-disabled="true"] { opacity: 0.32; }   /* shell sets this */
+  .url { flex: 1; min-width: 0; height: 40px; border: 0; padding: 0 12px;
+         background: #0b1220; color: inherit; font-size: 20px; }
+</style>
+</head>
+<body>
+  <button class="btn" data-action="back">
+    <img src="sdmc:/switch/brewser/themes/assets/left.png" alt="Back">
+  </button>
+  <button class="btn" data-action="home">
+    <img src="sdmc:/switch/brewser/themes/assets/home.png" alt="Home">
+  </button>
+
+  <input class="url" data-action="address-bar" readonly>
+
+  <button class="btn" data-action="settings">
+    <img src="sdmc:/switch/brewser/themes/assets/settings.png" alt="Settings">
+  </button>
+</body>
+</html>
+```
+
+Register it and pick it in Settings:
+
+```json
+{ "title": "My Bar", "path": "themes/toolbars/my-bar.html", "height": 56 }
+```
+
+## Position, height and hiding it
+
+Two toolbar preferences live in Settings rather than in the HTML, so the same
+toolbar works either way:
+
+- **Position** — top or bottom of the screen (`config.json` key
+  `toolbarPosition`, `"top"` or `"bottom"`). The shell stamps the chosen side on
+  the toolbar as `data-toolbar-position`, so your CSS can move the border to the
+  page-facing edge:
+  ```css
+  .toolbar { border-bottom: 2px solid #1f2c4d; }
+  body[data-toolbar-position="bottom"] .toolbar {
+    border-bottom: 0; border-top: 2px solid #1f2c4d;
+  }
+  ```
+- **Show/hide** — the whole strip can be turned off (`showToolbar`), giving apps
+  the full screen.
+
+The `height` from `toolbars.json` sets how tall the strip is; design your layout
+to fill `100vh` so it adapts to whatever height is configured.
+
+## Related
+
+- [Cursors](/docs/customize/cursors) and the toolbar icons both live under
+  `themes/assets/` and `themes/cursors/`.
+- [Customize Brewser](/docs/customize) — selecting themes and the update caveat.
