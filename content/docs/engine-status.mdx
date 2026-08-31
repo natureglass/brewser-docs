@@ -1,0 +1,98 @@
+---
+title: Engine Status
+description: How complete Brewser's HTML, CSS & DOM engine is — an honest coverage map
+---
+
+There is no browser to borrow from on the Switch. Brewser's DOM tree, CSS
+cascade, and layout engine are hand-reimplemented in TypeScript (~26K lines)
+running on top of the nx.js/V8 + Skia foundation (see
+[Architecture](/docs/runtime/architecture)). It's a genuine cascade and a
+genuine layout engine, not a shim — deep where real pages and libraries
+exercise it, shallower in the less-common corners of the spec.
+
+**Overall: roughly 70–75% of the "real-world app" surface.** This page is the
+honest map of where each pillar stands. It's updated with each release, and the
+gap lists below double as the contribution roadmap.
+
+## What to expect
+
+**Works very well today:** hand-written pages, jQuery-era scripts, forms, and
+canvas/WebGL apps.
+
+**Will break today:** libraries that lean on capture-phase event listeners,
+`el.closest()` / complex `querySelector`, `position: sticky`, `flex-wrap`, or
+CSS transitions/filters.
+
+If an app or library breaks for you, [file an issue](https://github.com/natureglass/Brewser/issues)
+with its name — real-world breakage reports directly shape what gets built next.
+
+## DOM — ~75%
+
+**Solid / production-grade:**
+
+- Tree mutation: `appendChild` / `removeChild` / `insertBefore` / `replaceChild` / `append` / `prepend` / `remove` / `insertAdjacentHTML` — all with fragment spreading, MutationObserver notification, and paint notify
+- `innerHTML` parses real markup (not just text), `outerHTML` (get-only), `textContent`, `cloneNode`
+- Attributes + `dataset` (full Proxy), `classList`, `getElementById` / `getElementsByClassName` / `getElementsByTagName`
+- Geometry: `getBoundingClientRect`, `offset*` / `client*` / `scroll*`, `scrollIntoView`
+- MutationObserver (tier-1, wired at every mutation site)
+
+**Notable gaps:**
+
+- `closest()` and `matches()` are absent
+- `nextElementSibling` / `previousElementSibling` / `firstElementChild` etc. missing
+- `querySelector` only matches a single simple selector (`#id`, `.class`, `tag`, `[attr=v]`) — no combinators, compound selectors, or pseudo-classes. The CSS engine itself understands all of those; that richer matcher just isn't exposed to `querySelector` yet
+- Events have no capture phase; `once` / `passive` / `capture` options are ignored; bubbling works but `event.target` isn't retargeted
+
+## HTML — ~70%
+
+**Parser:** tag-soup-tolerant subset — no spec tokenizer / insertion modes, but handles void elements, self-closing tags, all attribute quoting styles, comments, raw-text elements (`<script>` / `<style>`), numeric plus ~90 named entities, and reasonable error recovery.
+
+**Element coverage is broad:** structural and semantic tags, inline text tags, real `<table>` layout, `img` / `canvas` / inline SVG / `video` / `audio` / `iframe`, `details` / `summary`, `dialog`, `meter` / `progress`.
+
+**Forms are the most complete area:** input types text / password / email / checkbox / radio / range / color / date / time / number / file / hidden / button, full `<select>` (optgroup, multiple), `<textarea>`, `<label for>`.
+
+**Gaps:**
+
+- CDATA is broken; small named-entity table; comments and doctype are discarded; no `<template>` content model
+- POST forms navigate with no request body (GET is fully implemented); no `<datalist>` / `<fieldset>` chrome
+- Inline SVG supports translate-only transforms — no `<text>`, gradients, or filters
+- `<video>` has no subtitle tracks
+- `iframe` sandbox / CSP attributes are parsed but not enforced (treated as same-origin)
+
+## CSS — ~70%
+
+**Selectors & cascade — strongest area, ~82%:**
+
+- Full selector syntax including all combinators, the `:nth-child` family (proper an+b), `:not()`, `:hover` / `:focus` / `:checked` / `:disabled` / `:empty`, `::before` / `::after` with `content: attr()`
+- Real specificity + source order, `!important`, UA default stylesheet
+- CSS variables, `calc()` / `min()` / `max()` / `clamp()`, `@media`, `@font-face`, `@keyframes`
+- Gaps: no `@supports` / `@import` / `@layer` / `@container`; `::placeholder` / `::marker` / `::selection` unsupported
+
+**Layout — ~65%:** block / inline / inline-block, Flexbox ~70%, Grid ~60%, tables ~40%, float, and all positioning (static / relative / absolute / fixed).
+
+- Gaps: no `flex-wrap`, no `position: sticky`, no margin collapsing, no `align-self` / `align-content`, no grid `template-areas` / `auto-fill`, no table `colspan` / `rowspan`
+
+**Visual — ~65%:** colors, linear/radial gradients, `background-image`, `box-shadow`, `border-radius` (uniform), `opacity`, `z-index` / stacking, real overflow scrolling, `object-fit`, 2D transforms (translate / rotate / scale), `writing-mode`.
+
+- Gaps: no `transition`, no `filter` / `backdrop-filter`, no 3D / skew / matrix transforms, no `outline`, no non-solid border styles, no `clip-path`
+
+**Units — ~80%:** `px`, `%`, `em` / `rem`, `vw` / `vh` (+ `dvh` / `svh`), `vmin` / `vmax`, `ch`, `auto`, `env()`, `calc()`. Physical units (`cm` / `mm` / `pt`) are dropped.
+
+## Summary
+
+| Area | Complete | Biggest missing pieces |
+|------|----------|------------------------|
+| DOM  | ~75% | `closest` / `matches`, element-sibling accessors, combinator selectors in `querySelector`, event capture |
+| HTML | ~70% | spec parser (CDATA / entities), POST bodies, SVG richness, iframe sandbox enforcement |
+| CSS  | ~70% | transitions, filters, sticky, flex-wrap, margin collapsing, 3D transforms |
+
+## Related
+
+- [Web Platform Support](/docs/runtime/web-platform) — the JavaScript APIs and standards Brewser implements
+- [Graphics](/docs/runtime/graphics) — Canvas 2D and WebGL, which sit beside this engine
+- [Known Limitations](/docs/support/limitations) — the shorter list of the biggest current gaps
+- [Roadmap](/docs/support/roadmap) — where the gaps above are headed next
+
+---
+
+*Last updated for Brewser v1.0.0 — September 2026. Percentages are honest estimates of real-world surface coverage, not spec-section counts.*
