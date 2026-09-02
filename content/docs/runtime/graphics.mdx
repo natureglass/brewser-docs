@@ -10,12 +10,15 @@ Fully supported, backed by Skia. Text, paths, images, compositing and
 
 ## WebGL 1
 
-WebGL isn't hand-reimplemented — it's a bridge from JavaScript straight to the
-Switch's Tegra X1 GPU. Shaders and draws run on real silicon, JIT-compiled, so
-the question isn't *"is it built?"* but *"how much of the WebGL API surface and
-how many extensions are wired through?"*. The complete context / draw / state /
-buffer / texture / shader API is present for **both** versions, and extensions
-are **driver-probed** — a name is advertised only when the underlying GL driver
+WebGL isn't a software reimplementation — it's Brewser's own bridge. nx.js
+provided the initial GL wiring; Brewser built it out into the complete
+WebGL 1 & 2 API surface, the driver-probed extension system and the supporting
+libraries, all mapping JavaScript straight to the Switch's Tegra X1 GPU. Shaders
+and draws run on real silicon, JIT-compiled, so the practical question isn't
+whether the bridge exists but *how much of the WebGL API surface and how many
+extensions are wired through it*. The complete context / draw / state / buffer /
+texture / shader API is present for **both** versions, and extensions are
+**driver-probed** — a name is advertised only when the underlying GL driver
 actually supports it, so `getSupportedExtensions()` and `getExtension()` are
 consistent by construction and never over-promise.
 
@@ -28,12 +31,13 @@ WebGL 1 is the safest, most compatible target.
 
 ## WebGL 2
 
-Supported including advanced usage, and under active conformance hardening.
+Supported including advanced usage, and validated against the Khronos WebGL
+conformance suite, with hardening ongoing.
 
 - Full GLSL ES 3.00 (`#version 300 es`) surface: VAOs, uniform buffer objects, transform feedback, 3D & 2D-array textures (`texImage3D` / `texStorage3D` / `framebufferTextureLayer`), sampler objects, sync / fence objects, occlusion & timer queries, integer vertex attributes, and every `uniform*` / `uniformMatrix*` variant
 - Multiple render targets, `blitFramebuffer`, multisample renderbuffers, `readBuffer` / `drawBuffers`, `EXT_color_buffer_float` / `half_float`, `EXT_texture_norm16`, sRGB
 - Real-world proof: complex Three.js (r162) scenes, PMREM environment maps and multi-pass post-processing render JIT-optimized on hardware
-- Gaps: layered / 3D-texture *sampling* (`sampler3D` / `sampler2DArray`) is limited by the Tegra GPU driver rather than the bridge; conformance is still being hardened — if you hit a missing method or extension, **please report it**
+- Gaps: layered / 3D-texture *sampling* (`sampler3D` / `sampler2DArray`) is limited by the Tegra GPU driver rather than the bridge; conformance hardening against the Khronos suite is ongoing — if you hit a missing method or extension, **please report it**
 
 Coverage here is broad but not exhaustive. For the headline coverage numbers,
 see [Engine Status](/docs/engine-status).
