@@ -23,7 +23,9 @@ optimizing JIT compiler. Modern JavaScript (ES2023+) works out of the box.
 Two rendering paths coexist on the same screen surface:
 
 - **Canvas 2D** is backed by Skia.
-- **WebGL 1 / WebGL 2** map to OpenGL ES through Mesa's Nouveau driver.
+- **WebGL 1 / WebGL 2** run through Brewser's own bridge — built out from
+  nx.js's initial GL wiring — which maps the WebGL API to OpenGL ES via Mesa's
+  Nouveau driver.
 
 The runtime carefully manages GL state so that Skia-drawn UI and
 WebGL-rendered app content can share the device without stepping on each
