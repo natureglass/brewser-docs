@@ -33,6 +33,9 @@ answers honestly, returning `"maybe"` for the container/codec combinations it ca
 Media can come from local files, blobs, and the network — including **HLS streams** over HTTPS (see
 [Networking](/docs/runtime/networking)).
 
+There are no subtitle or text tracks yet — `<track>` elements are ignored, so plan for burned-in
+captions if you need them.
+
 ## Codec support
 
 Playback works well for the formats below. Decoding is done in software (via FFmpeg), so the codec
@@ -77,6 +80,7 @@ Browse them at [play.brewser.io](https://play.brewser.io).
 
 ## Related
 
+- [Engine Status](/docs/engine-status) — how complete audio & video are, with the coverage numbers.
 - [Networking in Apps](/docs/runtime/networking) — streaming media over the network.
 - [Performance](/docs/tips/performance) — getting smooth playback on Tegra X1.
 - [Known Limitations](/docs/support/limitations).
