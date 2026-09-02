@@ -19,7 +19,10 @@ The last two pillars — **WebGL** and **Audio & Video** — are a different kin
 thing: they aren't hand-reimplemented, they bridge JavaScript straight to the
 Switch's GPU and to FFmpeg. Because they run on real silicon, they stand higher
 on the coverage map, and the "gap" question shifts from *"is it built?"* to
-*"which of the API surface and extensions are wired through the bridge?"*.
+*"which of the API surface and extensions are wired through the bridge?"*. The
+summaries below give the headline numbers; the full extension lists, codec
+matrix and gaps live on the [Graphics](/docs/runtime/graphics) and
+[Audio & Media](/docs/runtime/audio-and-media) runtime pages.
 
 ## What to expect
 
@@ -88,54 +91,24 @@ with its name — real-world breakage reports directly shape what gets built nex
 ## WebGL 1 & 2 — ~88%
 
 WebGL isn't hand-reimplemented — it's a bridge from JavaScript straight to the
-Switch's Tegra X1 GPU. Shaders and draws run on real silicon, JIT-compiled, so
-the coverage question isn't *"is it built?"* but *"how much of the WebGL API
-surface and how many extensions are wired through?"*. The answer is: most of it.
-The complete context / draw / state / buffer / texture / shader API is present
-for **both** versions, and extensions are **driver-probed** — a name is
-advertised only when the underlying GL driver actually supports it, so
-`getSupportedExtensions()` and `getExtension()` are consistent by construction
-and never over-promise.
-
-**WebGL 1 — ~92%.** The safest, most compatible target.
-
-- Complete GLSL ES 1.00 pipeline; textures (2D + cube), mipmaps, framebuffers / renderbuffers, depth textures
-- Driver-probed extensions: `ANGLE_instanced_arrays`, `OES_vertex_array_object`, `OES_element_index_uint`, `OES_standard_derivatives`, `OES_texture_float` / `half_float` (+ `_linear`), `WEBGL_depth_texture`, `WEBGL_draw_buffers`, `EXT_sRGB`, `EXT_blend_minmax`, anisotropic filtering, plus the full compressed-texture family (S3TC / DXT, ETC1 / ETC2, ASTC, BPTC, RGTC)
-- Real-world proof: Unity WebGL 1 exports run, and generative / demoscene / full-screen-shader apps are a platform specialty
-- Gaps: coverage is broad but not exhaustive — an exotic `getExtension()` can still return `null`
-
-**WebGL 2 — ~85%.** Supported including advanced usage; under active conformance hardening.
-
-- Full GLSL ES 3.00 (`#version 300 es`) surface: VAOs, uniform buffer objects, transform feedback, 3D & 2D-array textures (`texImage3D` / `texStorage3D` / `framebufferTextureLayer`), sampler objects, sync / fence objects, occlusion & timer queries, integer vertex attributes, and every `uniform*` / `uniformMatrix*` variant
-- Multiple render targets, `blitFramebuffer`, multisample renderbuffers, `readBuffer` / `drawBuffers`, `EXT_color_buffer_float` / `half_float`, `EXT_texture_norm16`, sRGB
-- Real-world proof: complex Three.js (r162) scenes, PMREM environment maps and multi-pass post-processing render JIT-optimized on hardware
-- Gaps: layered / 3D-texture *sampling* (`sampler3D` / `sampler2DArray`) is limited by the Tegra GPU driver rather than the bridge; conformance is still being hardened — if you hit a missing method or extension, **please report it**
+Switch's Tegra X1 GPU, so shaders and draws run JIT-compiled on real silicon and
+extensions are **driver-probed** (a name is advertised only when the underlying
+GL driver actually supports it, never over-promising). The full context / draw /
+state / buffer / texture / shader API is present for **both** versions:
+**WebGL 1 sits around ~92%** — the safest, most-compatible target — and
+**WebGL 2 around ~85%**, supported including advanced usage and under active
+conformance hardening. For the complete extension lists, the GLSL ES 3.00
+surface, the real-world proof points and the current gaps, see
+[Graphics](/docs/runtime/graphics).
 
 ## Audio & Video — ~80%
 
 Like WebGL, audio and video are bridge-backed rather than hand-reimplemented:
-Web Audio runs on a hardware-backed audio graph, and `<audio>` / `<video>`
-decode in software via FFmpeg. Playback is solid across a broad codec list — the
-practical ceiling is **bandwidth**, not format.
-
-**Web Audio — ~70%.** The core graph is real and hardware-backed.
-
-- Real nodes: `AudioContext` / `OfflineAudioContext`, `AudioDestinationNode`, `GainNode`, `StereoPannerNode`, `AudioBufferSourceNode`, `OscillatorNode`
-- `AnalyserNode` returns real time / frequency data, so spectrum visualisers work; `AudioParam` automation and `decodeAudioData` are implemented, and `new Audio()` works for SFX and music (whole-file decode)
-- Compatibility shims: filter / convolver / panner nodes pass audio through unprocessed; delay / compressor / wave-shaper / script-processor are present but inert. `connect()` is lenient — an unsupported connection is a no-op, not a throw — so libraries that build large graphs keep running
-- Build your core sound on the real nodes above and you're on solid ground
-
-**`<audio>` / `<video>` playback — ~85%.** Elements play through the runtime's media pipeline.
-
-- Sources: local files, blobs, and the network — including **HLS streams over HTTPS**
-- `canPlayType()` answers honestly, returning `"maybe"` for the container / codec combinations it can actually decode
-- Gaps: no subtitle / text tracks; the hardware video block isn't engaged, so decoding is CPU-side (see the bandwidth note below)
-
-**Codecs — broad (FFmpeg, software-decoded):**
-
-- **Video:** H.264 / AVC (best — smooth at 720p), H.265 / HEVC, VP8, VP9, AV1, MPEG-1/2/4, VC-1, Theora
-- **Audio:** MP3, AAC / M4A, Ogg Vorbis, Opus, FLAC, WAV / PCM, AC3 / EAC3, ALAC, WMA
-- Everything decodes; the limiter is bandwidth — 1080p and the heavier codecs (VP9, AV1) can drop frames on the Tegra X1. Prefer **H.264 at 720p** for the smoothest video
+Web Audio runs on a hardware-backed audio graph (**~70%**), and `<audio>` /
+`<video>` decode in software via FFmpeg (**~85%**). Playback is solid across a
+broad codec list — the practical ceiling is **bandwidth**, not format. For the
+full node list, the compatibility shims, the lenient `connect()` behaviour and
+the complete codec matrix, see [Audio & Media](/docs/runtime/audio-and-media).
 
 ## Summary
 
@@ -144,9 +117,9 @@ practical ceiling is **bandwidth**, not format.
 | DOM  | ~75% | `closest` / `matches`, element-sibling accessors, combinator selectors in `querySelector`, event capture |
 | HTML | ~70% | spec parser (CDATA / entities), POST bodies, SVG richness, iframe sandbox enforcement |
 | CSS  | ~70% | transitions, filters, sticky, flex-wrap, margin collapsing, 3D transforms |
-| WebGL 1 | ~92% | exhaustive extension coverage |
-| WebGL 2 | ~85% | layered / 3D-texture sampling (GPU-driver-limited), full conformance hardening |
-| Audio & Video | ~80% | Web Audio effect nodes (filter / convolver / delay / compressor), subtitle tracks, hardware video decode |
+| [WebGL 1](/docs/runtime/graphics) | ~92% | exhaustive extension coverage |
+| [WebGL 2](/docs/runtime/graphics) | ~85% | layered / 3D-texture sampling (GPU-driver-limited), full conformance hardening |
+| [Audio & Video](/docs/runtime/audio-and-media) | ~80% | Web Audio effect nodes (filter / convolver / delay / compressor), subtitle tracks, hardware video decode |
 
 ## Related
 
