@@ -16,12 +16,13 @@ pillar stands. It's updated with each release, and the gap lists below double as
 the contribution roadmap.
 
 The last two pillars — **WebGL** and **Audio & Video** — are a different kind of
-thing: they aren't hand-reimplemented, they bridge JavaScript straight to the
-Switch's GPU and to FFmpeg. Because they run on real silicon, they stand higher
-on the coverage map, and the "gap" question shifts from *"is it built?"* to
-*"which of the API surface and extensions are wired through the bridge?"*. The
-summaries below give the headline numbers; the full extension lists, codec
-matrix and gaps live on the [Graphics](/docs/runtime/graphics) and
+thing: they aren't software reimplementations. Instead, Brewser's own hand-built
+bridges map the JavaScript APIs straight to the Switch's GPU and to FFmpeg.
+Because they run natively rather than through a JS reimplementation, they stand
+higher on the coverage map, and the question is less *"is it built?"* than
+*"how much of the API surface and how many extensions are wired through the
+bridge?"*. The summaries below give the headline numbers; the full extension
+lists, codec matrix and gaps live on the [Graphics](/docs/runtime/graphics) and
 [Audio & Media](/docs/runtime/audio-and-media) runtime pages.
 
 ## What to expect
@@ -90,15 +91,16 @@ with its name — real-world breakage reports directly shape what gets built nex
 
 ## WebGL 1 & 2 — ~88%
 
-WebGL isn't hand-reimplemented — it's a bridge from JavaScript straight to the
-Switch's Tegra X1 GPU, so shaders and draws run JIT-compiled on real silicon and
-extensions are **driver-probed** (a name is advertised only when the underlying
-GL driver actually supports it, never over-promising). The full context / draw /
-state / buffer / texture / shader API is present for **both** versions:
-**WebGL 1 sits around ~92%** — the safest, most-compatible target — and
-**WebGL 2 around ~85%**, supported including advanced usage and under active
-conformance hardening. For the complete extension lists, the GLSL ES 3.00
-surface, the real-world proof points and the current gaps, see
+WebGL isn't a software reimplementation — it's Brewser's own bridge, built out
+from nx.js's initial GL wiring into the complete WebGL 1 & 2 API surface running
+straight on the Switch's Tegra X1 GPU. Shaders and draws run JIT-compiled on
+real silicon, and extensions are **driver-probed** (a name is advertised only
+when the underlying GL driver actually supports it, never over-promising). The
+full context / draw / state / buffer / texture / shader API is present for
+**both** versions: **WebGL 1 sits around ~92%** — the safest, most-compatible
+target — and **WebGL 2 around ~85%**, supported including advanced usage and
+under active conformance hardening. For the complete extension lists, the
+GLSL ES 3.00 surface, the real-world proof points and the current gaps, see
 [Graphics](/docs/runtime/graphics).
 
 ## Audio & Video — ~80%
