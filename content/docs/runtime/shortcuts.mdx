@@ -1,0 +1,72 @@
+---
+title: App Shortcuts
+description: Launch a Brewser app straight from the Homebrew Menu with a per-app forwarder
+---
+
+Brewser can turn any app you've installed into its own entry in the **Homebrew
+Menu**. Pick an app, create a shortcut, and it shows up in hbmenu with its own
+name and icon — launching it boots straight into that app, skipping the Brewser
+shell entirely. Under the hood the shortcut is a small forwarder that hands
+Brewser the app to open; it isn't a copy of the app or of Brewser itself.
+
+## Creating a shortcut
+
+Every app's detail modal in the Brewser shell has a **Create shortcut** button
+(offered once the app is installed). Pressing it writes a small forwarder `.nro`
+to `sdmc:/switch/` on your SD card, carrying that app's own icon. The file is
+named after the app, so an app called *Compass* becomes `switch/Compass.nro`.
+
+When it's done, close Brewser: the app now appears as its own entry in the
+Homebrew Menu, with its name and icon, alongside your other homebrew.
+
+> **This is an hbmenu entry, not a home-screen tile.** The shortcut appears in
+> the Homebrew Menu — the same launcher you already open Brewser from. It is
+> *not* a Horizon home-menu tile: nothing new appears on the Switch's home
+> screen next to your games.
+
+## What launching it does
+
+The shortcut is a tiny forwarder. When you launch it, it starts Brewser with a
+launch parameter — the target app's id — and Brewser boots directly into that
+app.
+
+That launch skips the Brewser shell completely: no home page, no catalogue, no
+toolbar. The app opens fullscreen and behaves like a standalone homebrew title.
+Exiting the app returns you to the Homebrew Menu.
+
+## Shortcuts track the installed app
+
+Because the shortcut launches by app id, it always runs whatever version of the
+app you currently have installed. Updating the app updates what the shortcut
+opens — you don't need to recreate the shortcut after an update. If the app
+isn't installed when you launch the shortcut, Brewser shows a short screen
+telling you to open Brewser and download it.
+
+> **Shortcuts are launchers, not copies.** A shortcut doesn't contain the app or
+> the runtime — it's still Brewser doing the work underneath. The Brewser `.nro`
+> must stay installed at `sdmc:/switch/brewser.nro`; every shortcut ultimately
+> boots it. Removing or moving Brewser breaks all of your shortcuts at once.
+
+## Removing a shortcut
+
+There's no shortcut-management screen inside Brewser — creating a shortcut is the
+only thing the shell does here. To remove one, delete its `.nro` from
+`sdmc:/switch/` yourself: power off and edit the SD card on your computer, or use
+an on-device file manager. Deleting `switch/Compass.nro` removes the *Compass*
+shortcut and nothing else; the app itself (and Brewser) are untouched.
+
+## Advanced: it's an ordinary NRO
+
+The shortcut is a plain homebrew `.nro` like any other, so you can point standard
+forwarder tooling at it — for example, to build your own home-menu forwarder
+chain if you want the app on the Switch home screen. Brewser itself deliberately
+generates only NRO shortcuts, not NSP forwarders; that's a scope choice, and
+anything beyond the hbmenu entry is left to existing tools.
+
+## Related
+
+- [Customize Brewser](/docs/customize) — the SD-card files that drive the shell,
+  which live under the same `switch/brewser/` folder
+- [Engine Status](/docs/engine-status) — what the runtime each shortcut boots
+  into can actually do
+- [How the Runtime Works](/docs/runtime) — the launch flow a shortcut plugs into
