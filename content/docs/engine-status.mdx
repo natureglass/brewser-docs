@@ -31,8 +31,7 @@ lists, codec matrix and gaps live on the [Graphics](/docs/runtime/graphics) and
 canvas/WebGL apps, and audio/video playback.
 
 **Will break today:** libraries that lean on capture-phase event listeners,
-`el.closest()` / complex `querySelector`, `position: sticky`, `flex-wrap`, or
-CSS transitions/filters.
+`el.closest()` / complex `querySelector`, or CSS transitions/filters.
 
 If an app or library breaks for you, [file an issue](https://github.com/natureglass/Brewser/issues)
 with its name — real-world breakage reports directly shape what gets built next.
@@ -79,9 +78,9 @@ with its name — real-world breakage reports directly shape what gets built nex
 - CSS variables, `calc()` / `min()` / `max()` / `clamp()`, `@media`, `@font-face`, `@keyframes`
 - Gaps: no `@supports` / `@import` / `@layer` / `@container`; `::placeholder` / `::marker` / `::selection` unsupported
 
-**Layout — ~65%:** block / inline / inline-block, Flexbox ~70%, Grid ~60%, tables ~55% (auto column widths, `colspan` / `rowspan`), float, and all positioning (static / relative / absolute / fixed).
+**Layout — ~72%:** block / inline / inline-block, Flexbox ~80% (including `flex-wrap` with `align-content` / `align-self` / `justify-content: space-evenly`), Grid ~60%, tables ~55% (auto column widths, `colspan` / `rowspan`), float, and all positioning (static / relative / absolute / fixed / sticky).
 
-- Gaps: no `flex-wrap`, no `position: sticky`, no margin collapsing, no `align-self` / `align-content`, no grid `template-areas` / `auto-fill`, no table `border-collapse` / nested-table promotion
+- Gaps: no margin collapsing, no grid `template-areas` / `auto-fill`, no table `border-collapse` / nested-table promotion; `position: sticky` is vertical and page-level only (not yet inside nested scroll containers)
 
 **Visual — ~65%:** colors, linear/radial gradients, `background-image`, `box-shadow`, `border-radius` (uniform), `opacity`, `z-index` / stacking, real overflow scrolling, `object-fit`, 2D transforms (translate / rotate / scale), `writing-mode`.
 
@@ -118,7 +117,7 @@ the complete codec matrix, see [Audio & Media](/docs/runtime/audio-and-media).
 |------|----------|------------------------|
 | DOM  | ~75% | `closest` / `matches`, element-sibling accessors, combinator selectors in `querySelector`, event capture |
 | HTML | ~77% | spec parser (insertion modes / `<template>`), multipart form uploads, SVG richness (patterns / filters / `<image>`), iframe sandbox enforcement |
-| CSS  | ~70% | transitions, filters, sticky, flex-wrap, margin collapsing, 3D transforms |
+| CSS  | ~73% | transitions, filters, margin collapsing, 3D transforms, non-solid borders |
 | [WebGL 1](/docs/runtime/graphics) | ~92% | exhaustive extension coverage |
 | [WebGL 2](/docs/runtime/graphics) | ~85% | layered / 3D-texture sampling (GPU-driver-limited), full conformance hardening |
 | [Audio & Video](/docs/runtime/audio-and-media) | ~80% | Web Audio effect nodes (filter / convolver / delay / compressor), subtitle tracks, hardware video decode |
