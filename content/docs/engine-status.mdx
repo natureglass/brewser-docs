@@ -30,28 +30,32 @@ lists, codec matrix and gaps live on the [Graphics](/docs/runtime/graphics) and
 **Works very well today:** hand-written pages, jQuery-era scripts, forms,
 canvas/WebGL apps, and audio/video playback.
 
-**Will break today:** libraries that lean on capture-phase event listeners,
-`el.closest()` / complex `querySelector`, or CSS transitions/filters.
+**Will break today:** libraries that depend on CSS transitions or `filter` /
+`backdrop-filter` effects, or on a spec-compliant HTML parser (`<template>`
+content, implicit `<head>` / `<body>` synthesis).
 
 If an app or library breaks for you, [file an issue](https://github.com/natureglass/Brewser/issues)
 with its name — real-world breakage reports directly shape what gets built next.
 
-## DOM — ~75%
+## DOM — ~82%
 
 **Solid / production-grade:**
 
 - Tree mutation: `appendChild` / `removeChild` / `insertBefore` / `replaceChild` / `append` / `prepend` / `remove` / `insertAdjacentHTML` — all with fragment spreading, MutationObserver notification, and paint notify
 - `innerHTML` parses real markup (not just text), `outerHTML` (get-only), `textContent`, `cloneNode`
 - Attributes + `dataset` (full Proxy), `classList`, `getElementById` / `getElementsByClassName` / `getElementsByTagName`
+- `querySelector` / `querySelectorAll` / `closest()` / `matches()` with the full selector engine — combinators (`>` / `+` / `~` / descendant), compound selectors, selector lists, `*`, every attribute matcher (`^=` / `$=` / `*=` / `~=` / `|=`), and pseudo-classes (`:nth-child` family, `:not`, `:first`/`:last-child`, `:checked`, `:empty`…)
+- Element-only traversal: `firstElementChild` / `lastElementChild` / `nextElementSibling` / `previousElementSibling` / `childElementCount`
+- Events: full capture → target → bubble dispatch with `event.target` / `currentTarget` set per node (so delegation via `e.target.matches()` works), `{ capture, once, passive }` options, and `stopPropagation`
 - Geometry: `getBoundingClientRect`, `offset*` / `client*` / `scroll*`, `scrollIntoView`
 - MutationObserver (tier-1, wired at every mutation site)
 
 **Notable gaps:**
 
-- `closest()` and `matches()` are absent
-- `nextElementSibling` / `previousElementSibling` / `firstElementChild` etc. missing
-- `querySelector` only matches a single simple selector (`#id`, `.class`, `tag`, `[attr=v]`) — no combinators, compound selectors, or pseudo-classes. The CSS engine itself understands all of those; that richer matcher just isn't exposed to `querySelector` yet
-- Events have no capture phase; `once` / `passive` / `capture` options are ignored; bubbling works but `event.target` isn't retargeted
+- `children` still includes text / comment nodes (spec is elements-only) — the element-walking accessors above are the correct-behaving alternative
+- Missing `replaceWith` / `before` / `after` / `replaceChildren` / `normalize`; `outerHTML` has no setter
+- Dispatching a real `Event` instance doesn't retarget its read-only `target` (plain event objects are fully supported); document / window-level capture listeners aren't wired
+- `dialog.showModal()` has no focus trap or Esc-to-close; `setPointerCapture` doesn't reroute events
 
 ## HTML — ~77%
 
@@ -69,7 +73,7 @@ with its name — real-world breakage reports directly shape what gets built nex
 - `<video>` has no subtitle (`<track>`) tracks; `poster` image isn't loaded (a first-frame preview stands in)
 - `iframe` sandbox / CSP attributes are parsed but not enforced (treated as same-origin)
 
-## CSS — ~70%
+## CSS — ~73%
 
 **Selectors & cascade — strongest area, ~82%:**
 
@@ -115,7 +119,7 @@ the complete codec matrix, see [Audio & Media](/docs/runtime/audio-and-media).
 
 | Area | Complete | Biggest missing pieces |
 |------|----------|------------------------|
-| DOM  | ~75% | `closest` / `matches`, element-sibling accessors, combinator selectors in `querySelector`, event capture |
+| DOM  | ~82% | `replaceWith` / `before` / `after`, `children` elements-only, real `Event` `target` retarget, `dialog` focus trap |
 | HTML | ~77% | spec parser (insertion modes / `<template>`), multipart form uploads, SVG richness (patterns / filters / `<image>`), iframe sandbox enforcement |
 | CSS  | ~73% | transitions, filters, margin collapsing, 3D transforms, non-solid borders |
 | [WebGL 1](/docs/runtime/graphics) | ~92% | exhaustive extension coverage |
