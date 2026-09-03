@@ -54,20 +54,20 @@ with its name — real-world breakage reports directly shape what gets built nex
 - `querySelector` only matches a single simple selector (`#id`, `.class`, `tag`, `[attr=v]`) — no combinators, compound selectors, or pseudo-classes. The CSS engine itself understands all of those; that richer matcher just isn't exposed to `querySelector` yet
 - Events have no capture phase; `once` / `passive` / `capture` options are ignored; bubbling works but `event.target` isn't retargeted
 
-## HTML — ~70%
+## HTML — ~77%
 
-**Parser:** tag-soup-tolerant subset — no spec tokenizer / insertion modes, but handles void elements, self-closing tags, all attribute quoting styles, comments, raw-text elements (`<script>` / `<style>`), numeric plus ~90 named entities, and reasonable error recovery.
+**Parser:** tag-soup-tolerant subset — no spec tokenizer / insertion modes, but handles void elements, self-closing tags, all attribute quoting styles, comments, CDATA sections, raw-text elements (`<script>` / `<style>`), numeric plus ~230 named entities (Latin-1, Greek, math/arrows) with or without the trailing semicolon, and reasonable error recovery.
 
 **Element coverage is broad:** structural and semantic tags, inline text tags, real `<table>` layout, `img` / `canvas` / inline SVG / `video` / `audio` / `iframe`, `details` / `summary`, `dialog`, `meter` / `progress`.
 
-**Forms are the most complete area:** input types text / password / email / checkbox / radio / range / color / date / time / number / file / hidden / button, full `<select>` (optgroup, multiple), `<textarea>`, `<label for>`.
+**Forms are the most complete area:** input types text / password / email / checkbox / radio / range / color / date / time / number / file / hidden / button / submit / reset / image, full `<select>` (optgroup, multiple), `<textarea>`, `<label for>`, `<fieldset>` / `<legend>` (border + legend cut-out chrome), submit-button `formaction` / `formmethod` overrides, form reset, constraint validation on submit (`required` / `pattern` / `minlength` / `maxlength` / `min` / `max` / `type=email`, respecting `novalidate` / `formnovalidate`), and both GET (query string) and POST (`application/x-www-form-urlencoded` request body) submission.
 
 **Gaps:**
 
-- CDATA is broken; small named-entity table; comments and doctype are discarded; no `<template>` content model
-- POST forms navigate with no request body (GET is fully implemented); no `<datalist>` / `<fieldset>` chrome
-- Inline SVG supports translate-only transforms — no `<text>`, gradients, or filters
-- `<video>` has no subtitle tracks
+- Comments and doctype are discarded; no `<template>` content model; no implicit `<html>` / `<head>` / `<body>` synthesis
+- No `multipart/form-data` request bodies yet (binary file upload); urlencoded GET + POST are implemented. No `<datalist>` chrome
+- Inline SVG covers shapes, paths, clip-paths, `<text>` / `<tspan>` (font, `text-anchor`, per-tspan positioning), linear/radial gradients (stops, objectBoundingBox + userSpaceOnUse, `href` inheritance), full `transform` (translate / rotate / scale / skew / matrix), `viewBox` + `preserveAspectRatio`, and stroke styling (dash, line caps/joins, element + fill/stroke opacity) — but no patterns, filters, `<image>`, or `<use>`
+- `<video>` has no subtitle (`<track>`) tracks; `poster` image isn't loaded (a first-frame preview stands in)
 - `iframe` sandbox / CSP attributes are parsed but not enforced (treated as same-origin)
 
 ## CSS — ~70%
@@ -79,9 +79,9 @@ with its name — real-world breakage reports directly shape what gets built nex
 - CSS variables, `calc()` / `min()` / `max()` / `clamp()`, `@media`, `@font-face`, `@keyframes`
 - Gaps: no `@supports` / `@import` / `@layer` / `@container`; `::placeholder` / `::marker` / `::selection` unsupported
 
-**Layout — ~65%:** block / inline / inline-block, Flexbox ~70%, Grid ~60%, tables ~40%, float, and all positioning (static / relative / absolute / fixed).
+**Layout — ~65%:** block / inline / inline-block, Flexbox ~70%, Grid ~60%, tables ~55% (auto column widths, `colspan` / `rowspan`), float, and all positioning (static / relative / absolute / fixed).
 
-- Gaps: no `flex-wrap`, no `position: sticky`, no margin collapsing, no `align-self` / `align-content`, no grid `template-areas` / `auto-fill`, no table `colspan` / `rowspan`
+- Gaps: no `flex-wrap`, no `position: sticky`, no margin collapsing, no `align-self` / `align-content`, no grid `template-areas` / `auto-fill`, no table `border-collapse` / nested-table promotion
 
 **Visual — ~65%:** colors, linear/radial gradients, `background-image`, `box-shadow`, `border-radius` (uniform), `opacity`, `z-index` / stacking, real overflow scrolling, `object-fit`, 2D transforms (translate / rotate / scale), `writing-mode`.
 
@@ -117,7 +117,7 @@ the complete codec matrix, see [Audio & Media](/docs/runtime/audio-and-media).
 | Area | Complete | Biggest missing pieces |
 |------|----------|------------------------|
 | DOM  | ~75% | `closest` / `matches`, element-sibling accessors, combinator selectors in `querySelector`, event capture |
-| HTML | ~70% | spec parser (CDATA / entities), POST bodies, SVG richness, iframe sandbox enforcement |
+| HTML | ~77% | spec parser (insertion modes / `<template>`), multipart form uploads, SVG richness (patterns / filters / `<image>`), iframe sandbox enforcement |
 | CSS  | ~70% | transitions, filters, sticky, flex-wrap, margin collapsing, 3D transforms |
 | [WebGL 1](/docs/runtime/graphics) | ~92% | exhaustive extension coverage |
 | [WebGL 2](/docs/runtime/graphics) | ~85% | layered / 3D-texture sampling (GPU-driver-limited), full conformance hardening |
