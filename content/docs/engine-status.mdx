@@ -7,7 +7,7 @@ There is no browser to borrow from on the Switch. Brewser's DOM tree, CSS
 cascade, and layout engine are hand-reimplemented in TypeScript (~26K lines)
 running on top of the nx.js/V8 + Skia foundation (see
 [Architecture](/docs/runtime/architecture)). Overall, that hand-written engine
-(DOM, HTML, CSS) covers roughly 70-75% of the "real-world app" surface.
+(DOM, HTML, CSS) covers roughly 80% of the "real-world app" surface.
 
 This page is the honest list of what's **not** done yet — the gap lists double
 as the contribution roadmap. The last two pillars, WebGL and Audio & Video, are
@@ -22,11 +22,11 @@ real-world breakage reports directly shape what gets built next.
 - `outerHTML` has no setter; document / window-level capture listeners aren't wired
 - `dialog.showModal()` has no focus trap or Esc-to-close; `setPointerCapture` doesn't reroute events
 
-## HTML (~77%)
+## HTML (~80%)
 
 - No spec tokenizer / insertion modes: no `<template>` content model, no implicit `<html>` / `<head>` / `<body>` synthesis, comments and doctype are discarded (the parser is otherwise a tolerant tag-soup subset with error recovery)
 - No `multipart/form-data` request bodies (binary file upload); urlencoded GET + POST work. No `<datalist>` chrome
-- Inline SVG has no patterns, filters, `<image>`, or `<use>` (shapes / paths / `<text>` / gradients / `transform` / `viewBox` are covered)
+- Inline SVG has no SMIL animation and only a filter subset (`feGaussianBlur` / `feColorMatrix` / `feOffset` / `feDropShadow`); filter-graph primitives (`feComposite` / `feMerge` / `feTurbulence` / `feImage`), `gradientTransform` / `patternTransform`, and `spreadMethod` reflect/repeat aren't modelled (`<use>` / `<image>` / patterns / markers / masks, shapes / paths / `<text>` / gradients / `transform` / `viewBox` are covered)
 - `<video>` has no subtitle (`<track>`) tracks; `poster` isn't loaded (a first-frame preview stands in)
 - `iframe` `sandbox` / CSP attributes are parsed but not enforced (treated as same-origin)
 
@@ -59,7 +59,7 @@ hardware video decode. Full node list and codec matrix:
 | Area | Complete | Biggest missing pieces |
 |------|----------|------------------------|
 | DOM  | ~84% | `children` elements-only, `outerHTML` setter, document/window capture listeners, `dialog` focus trap |
-| HTML | ~77% | spec parser (insertion modes / `<template>`), multipart form uploads, SVG richness (patterns / filters / `<image>` / `<use>`), iframe sandbox enforcement |
+| HTML | ~80% | spec parser (insertion modes / `<template>`), multipart form uploads, advanced SVG (SMIL animation / filter-graph primitives), iframe sandbox enforcement |
 | CSS  | ~79% | margin collapsing, 3D / skew / matrix transforms, geometric transitions, `clip-path`, `@supports` / `@layer` |
 | [WebGL 1](/docs/runtime/graphics) | ~92% | exhaustive extension coverage |
 | [WebGL 2](/docs/runtime/graphics) | ~85% | layered / 3D-texture sampling (GPU-driver-limited), full conformance hardening |
@@ -73,4 +73,4 @@ hardware video decode. Full node list and codec matrix:
 - [Known Limitations](/docs/support/limitations): the shorter list of the biggest current gaps
 - [Roadmap](/docs/support/roadmap): where the gaps above are headed next
 
-*Last updated for Brewser v0.1.114, September 2026. Percentages are honest estimates of real-world surface coverage, not spec-section counts.*
+*Last updated for Brewser v0.1.116, September 2026. Percentages are honest estimates of real-world surface coverage, not spec-section counts.*
