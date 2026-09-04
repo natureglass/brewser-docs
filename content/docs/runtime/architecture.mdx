@@ -3,8 +3,8 @@ title: Architecture
 description: The engine stack powering Brewser on Tegra X1
 ---
 
-Brewser's runtime is built from production-grade open source components,
-running natively on the Switch's Tegra X1:
+Brewser's runtime is built on open source components that run natively on the
+Switch's Tegra X1:
 
 | Layer | Component |
 | --- | --- |
@@ -15,7 +15,7 @@ running natively on the Switch's Tegra X1:
 
 ## JavaScript engine
 
-Apps execute on V8 — the same engine as Chrome and Node.js — including its
+Apps execute on V8, the same engine used by Chrome and Node.js, including its
 optimizing JIT compiler. Modern JavaScript (ES2023+) works out of the box.
 
 ## Rendering
@@ -23,13 +23,12 @@ optimizing JIT compiler. Modern JavaScript (ES2023+) works out of the box.
 Two rendering paths coexist on the same screen surface:
 
 - **Canvas 2D** is backed by Skia.
-- **WebGL 1 / WebGL 2** run through Brewser's own bridge — built out from
-  nx.js's initial GL wiring — which maps the WebGL API to OpenGL ES via Mesa's
+- **WebGL 1 / WebGL 2** run through Brewser's own bridge, built out from
+  nx.js's initial GL wiring, which maps the WebGL API to OpenGL ES via Mesa's
   Nouveau driver.
 
-The runtime carefully manages GL state so that Skia-drawn UI and
-WebGL-rendered app content can share the device without stepping on each
-other.
+The runtime manages GL state so that Skia-drawn UI and WebGL-rendered app
+content can share the device without interfering with each other.
 
 ## App isolation
 

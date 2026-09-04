@@ -8,8 +8,8 @@ it can be published.
 
 ## What the scanner does
 
-The scanner performs static analysis of your JavaScript — building an AST and
-tracking how data flows through the code (taint tracking) — looking for
+The scanner performs static analysis of your JavaScript. It builds an AST and
+tracks how data flows through the code (taint tracking), looking for
 patterns like hidden network exfiltration, obfuscated payloads, or abuse of
 hardware APIs.
 
@@ -21,11 +21,11 @@ hardware APIs.
 | **SUSPICIOUS** | Needs a closer look | Manual review before publication |
 | **DANGEROUS** | Clear malicious pattern | Blocked |
 
-The verdict is a **publish gate**: only cleared apps reach the catalogue.
+The verdict is a publish gate: only cleared apps reach the catalogue.
 
 ## Tips for a clean pass
 
 - Avoid `eval` and dynamically-constructed code.
-- Keep third-party bundles readable — heavily obfuscated code is more likely
+- Keep third-party bundles readable; heavily obfuscated code is more likely
   to be flagged for manual review.
 - Only call the APIs your manifest declares.

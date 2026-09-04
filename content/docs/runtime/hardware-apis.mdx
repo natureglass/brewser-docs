@@ -3,28 +3,28 @@ title: Hardware APIs
 description: Talking to real hardware from web apps
 ---
 
-This is where Brewser shines for tinkerers. The Switch's USB port (and
-Bluetooth radio) become gateways to microcontrollers, MIDI gear and more —
-through the same APIs Chromium exposes.
+Brewser exposes hardware to web apps through the same APIs Chromium provides.
+The Switch's USB port and Bluetooth radio can reach microcontrollers, MIDI gear
+and other peripherals.
 
 ## Supported APIs
 
 | API | Status | Typical use |
 | --- | --- | --- |
-| WebSerial | ✅ Verified on hardware | ESP32/Arduino over USB CDC |
-| WebBluetooth | ✅ Verified on hardware | BLE sensors & peripherals |
-| Web MIDI | ✅ | MIDI controllers (e.g. AKAI pads) |
-| Web NFC | ✅ | Reading NFC tags |
+| WebSerial | Verified on hardware | ESP32/Arduino over USB CDC |
+| WebBluetooth | Verified on hardware | BLE sensors & peripherals |
+| Web MIDI | Yes | MIDI controllers (e.g. AKAI pads) |
+| Web NFC | Yes | Reading NFC tags |
 | WebUSB | See support matrix | Direct USB device access |
 
 ## Permission model
 
 Apps must declare required hardware in their
 [manifest](/docs/publishing/manifest). At runtime, the user picks the device
-from a system picker — modeled on Chrome's WebUSB/WebSerial flow. There is no
+from a system picker modeled on Chrome's WebUSB/WebSerial flow. There is no
 auto-connect: nothing talks to your hardware without an explicit user choice.
 
 ## Example: ESP32 over WebSerial
 
 Hotplug, connect, and exchange data with an ESP32 over USB CDC exactly as you
-would in Chrome — `navigator.serial.requestPort()`, open, read/write streams.
+would in Chrome: `navigator.serial.requestPort()`, open, read/write streams.

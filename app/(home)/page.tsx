@@ -23,14 +23,14 @@ const sections = [
     href: '/docs/features',
     icon: Plug,
     description:
-      'WebGL2, WebSerial, Bluetooth, MIDI — what works, side by side with Chromium.',
+      'WebGL2, WebSerial, Bluetooth, MIDI. What works, side by side with Chromium.',
   },
   {
     title: 'Runtime internals',
     href: '/docs/runtime',
     icon: Cpu,
     description:
-      'V8, Skia, and Mesa on Tegra X1 — how the engine actually works.',
+      'V8, Skia, and Mesa on Tegra X1. How the engine actually works.',
   },
 ];
 
@@ -59,7 +59,7 @@ export default function HomePage() {
 
         <p className="mx-auto mb-8 max-w-xl text-fd-muted-foreground">
           A web runtime for Nintendo Switch homebrew. Build with standard Web
-          APIs — if it runs in Chrome, it runs on your Switch.
+          APIs. If it runs in Chrome, it runs on your Switch.
         </p>
 
         <div className="mb-12 flex flex-wrap items-center justify-center gap-3">
@@ -81,7 +81,7 @@ export default function HomePage() {
         {/*
           Drop a short hardware capture (a Three.js demo or Neon Serpent
           running on a real Switch) at public/media/switch-demo.mp4 and
-          uncomment this block — it sells the project better than any copy:
+          uncomment this block to show it off:
 
         <video
           className="mx-auto mb-12 w-full max-w-xl rounded-xl border border-fd-border"

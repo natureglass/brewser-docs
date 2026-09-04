@@ -10,7 +10,7 @@ around Brewser. For the sensor side (motion, orientation), see
 ## Gamepad mapping
 
 Joy-Cons and the Pro Controller surface through the standard **Gamepad API**
-(`navigator.getGamepads()`), following the Standard Gamepad layout — so gamepad-aware web games
+(`navigator.getGamepads()`), following the Standard Gamepad layout, so gamepad-aware web games
 generally work unmodified.
 
 | Index | Button | Index | Button |
@@ -25,10 +25,10 @@ generally work unmodified.
 | 7 | ZR | 15 | D-pad Right |
 
 Axes: four, in order **left X, left Y, right X, right Y** (Y is inverted, per the Standard Gamepad
-convention — up is negative).
+convention, so up is negative).
 
 > **Nintendo A/B, X/Y.** Index 0 is the button physically labelled **A** (bottom-right on a Switch),
-> which is the *primary/accept* button — and index 1 is **B** (cancel). This matches the Standard
+> which is the *primary/accept* button, and index 1 is **B** (cancel). This matches the Standard
 > Gamepad's "index 0 = primary" convention, but note the physical positions are mirrored compared to
 > an Xbox pad: A and B are swapped, and X and Y are swapped. If you print button prompts, use the
 > index-to-label mapping above rather than assuming Xbox positions.
@@ -36,12 +36,12 @@ convention — up is negative).
 ## Touch
 
 The touchscreen fires standard **Touch** and **Pointer** events (and synthesises `click`).
-Remember touch works **only in handheld mode** — a docked console has no touchscreen — so always
-provide a gamepad path too.
+Touch works only in handheld mode, since a docked console has no touchscreen, so always provide a
+gamepad path too.
 
 ## Keyboard
 
-Text input uses an **on-screen keyboard overlay**, driven by the controller: move the cursor,
+Text input uses an on-screen keyboard overlay, driven by the controller: move the cursor,
 **A** activates the key under it, **B** cancels, and **+** submits. It's invoked automatically when
 a web form field needs input.
 
@@ -56,8 +56,8 @@ There's no single universal quit combo; instead:
 
 | To do this | Press |
 | --- | --- |
-| **Go back to the catalogue** | **L** (the left shoulder) — pops you out of the app back to Brewser |
-| **Exit the app** | **+** — published apps are configured to exit on Plus |
+| **Go back to the catalogue** | **L** (the left shoulder): pops you out of the app back to Brewser |
+| **Exit the app** | **+**: published apps are configured to exit on Plus |
 | **Quit Brewser entirely** (to the Homebrew Menu) | **HOME** |
 | **Leave an app's ad-hoc fullscreen** (e.g. a video or canvas that went fullscreen) | **L + R** together |
 
@@ -66,13 +66,13 @@ There's no single universal quit combo; instead:
 ## Docked vs handheld
 
 - **Resolution.** Apps render at 720p; docked output is scaled up to the TV. Design for 720p and
-  it looks right everywhere — see [Performance](/docs/tips/performance).
+  it looks right everywhere. See [Performance](/docs/tips/performance).
 - **Touch** is handheld-only (above).
 - **The software cursor** (for mouse-style interaction) can be shown or hidden per dock state via
   the manifest's `hideMouseDocked` / `hideMouseUndocked` flags.
 
 ## Related
 
-- [Input & Sensors](/docs/runtime/input-and-sensors) — motion and orientation.
-- [Manifest Reference](/docs/publishing/manifest) — `exitGame`, `buttonMapping`, cursor flags.
-- [Hints & Tips](/docs/tips) — designing for the couch.
+- [Input & Sensors](/docs/runtime/input-and-sensors): motion and orientation.
+- [Manifest Reference](/docs/publishing/manifest): `exitGame`, `buttonMapping`, cursor flags.
+- [Hints & Tips](/docs/tips): designing for the couch.

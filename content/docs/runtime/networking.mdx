@@ -3,33 +3,33 @@ title: Networking in Apps
 description: What fetch, XHR and WebSocket can actually reach
 ---
 
-Brewser apps can talk to the network with the standard tools — `fetch`, `XMLHttpRequest`, and
-`WebSocket` — and they reach further than a browser tab does, because the runtime isn't bound by
+Brewser apps can talk to the network with the standard tools (`fetch`, `XMLHttpRequest`, and
+`WebSocket`), and they reach further than a browser tab does, because the runtime isn't bound by
 the same-origin rules a browser enforces.
 
 ## What you can reach
 
-- **The public internet**, over both `http://` and `https://`. DNS resolution works, using the
+- The public internet, over both `http://` and `https://`. DNS resolution works, using the
   console's configured DNS.
-- **Your local network.** LAN addresses (`http://192.168.x.x`, a `.local` device, a Raspberry Pi
-  dashboard) are reachable — this is what makes Brewser a genuinely useful hardware/IoT dashboard.
-- **HLS and other network media streams**, handled by the media pipeline — see
+- Your local network. LAN addresses (`http://192.168.x.x`, a `.local` device, a Raspberry Pi
+  dashboard) are reachable, which makes Brewser useful as a hardware or IoT dashboard.
+- HLS and other network media streams, handled by the media pipeline. See
   [Audio & Media](/docs/runtime/audio-and-media).
 
 `XMLHttpRequest` is a polyfill over the same fetch machinery, so it reaches the same places (a
 synchronous `XHR` GET reads local files instead). `WebSocket` (`ws://` and `wss://`) works too.
 
-## The important gotchas
+## Gotchas
 
 > **HTTPS to a raw IP address fails.** Certificate validation matches on hostname, and a bare IP
-> has no matching certificate — so `https://192.168.1.50` won't connect. For LAN devices, use
-> **`http://192.168.1.50`** (plain HTTP to an IP works fine). `https://` to a real **hostname**
+> has no matching certificate, so `https://192.168.1.50` won't connect. For LAN devices, use
+> `http://192.168.1.50` (plain HTTP to an IP works fine). `https://` to a real hostname
 > works normally.
 
-- **No CORS.** Brewser has no browser "origin," so cross-origin requests just… work. You can call
-  an API that doesn't send `Access-Control-Allow-Origin` headers — something a browser tab can't do.
-  Great for talking to devices and services that were never CORS-configured.
-- **Mixed content is allowed.** An `https://` page can call `http://` endpoints; nothing is blocked
+- No CORS. Brewser has no browser "origin," so cross-origin requests work. You can call
+  an API that doesn't send `Access-Control-Allow-Origin` headers, something a browser tab can't do.
+  Useful for talking to devices and services that were never CORS-configured.
+- Mixed content is allowed. An `https://` page can call `http://` endpoints; nothing is blocked
   or upgraded.
 
 These make Brewser a friendlier network client than a browser, but they're also why you should be
@@ -37,19 +37,19 @@ deliberate: declare exactly what you talk to.
 
 ## Publishing: declare your hosts
 
-A published app that uses the network needs the network capability **and** every external host
+A published app that uses the network needs the network capability and every external host
 listed in its [manifest](/docs/publishing/manifest)'s `allowed_origins`. The
 [security scanner](/docs/publishing/security-review) compares the hosts your code contacts against
-that list and flags anything undeclared — so keep it accurate, and use literal URLs (assembled or
-obfuscated URLs get flagged). Apps that make no network calls declare nothing and get the smoothest
-launch.
+that list and flags anything undeclared, so keep it accurate, and use literal URLs (assembled or
+obfuscated URLs get flagged). Apps that make no network calls declare nothing, so there's nothing
+to check.
 
 ## The Home-Assistant / LAN-dashboard pattern
 
-A common Brewser use case is a couch dashboard for something on your network — Home Assistant, a
+A common Brewser use case is a couch dashboard for something on your network: Home Assistant, a
 Pi-hole, an ESP32 exposing a web endpoint, a NAS. The recipe:
 
-- Point `fetch` at the device over **`http://<lan-ip>`** (not `https://` to an IP — see above).
+- Point `fetch` at the device over `http://<lan-ip>` (not `https://` to an IP; see above).
 - No CORS headers required on the device.
 - Poll or open a `WebSocket` for live updates.
 
@@ -61,17 +61,17 @@ const res = await fetch('http://192.168.1.20:8123/api/states/sensor.temperature'
 const { state } = await res.json();
 ```
 
-## See it in action
+## Examples
 
-- **`com.natureglass.speedtest`** — runs a Cloudflare speed test over external HTTPS.
-- **`com.natureglass.streamcast`** — pulls a live HLS video stream and third-party APIs.
-- **`com.natureglass.speedwatch`** — talks to public map/geocoding APIs (this one targets
+- `com.natureglass.speedtest` runs a Cloudflare speed test over external HTTPS.
+- `com.natureglass.streamcast` pulls a live HLS video stream and third-party APIs.
+- `com.natureglass.speedwatch` talks to public map/geocoding APIs (this one targets
   mobile/web rather than the Switch, but shows the pattern).
 
 Browse them at [play.brewser.io](https://play.brewser.io).
 
 ## Related
 
-- [Manifest Reference](/docs/publishing/manifest) — `allowed_origins`.
-- [Security Review](/docs/publishing/security-review) — how declared hosts are checked.
-- [Web Platform Support](/docs/runtime/web-platform) — the standards Brewser implements.
+- [Manifest Reference](/docs/publishing/manifest): `allowed_origins`.
+- [Security Review](/docs/publishing/security-review): how declared hosts are checked.
+- [Web Platform Support](/docs/runtime/web-platform): the standards Brewser implements.

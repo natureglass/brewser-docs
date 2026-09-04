@@ -4,51 +4,48 @@ description: Cloud saves that follow you across devices, and shared scoreboards
 ---
 
 Brewser apps can remember your data and let you compete. Two separate systems
-power this:
+handle this:
 
-- **Saves** — your own private data for an app. Only you can read yours.
-- **Leaderboards** — a public, shared scoreboard an app submits scores to.
+- **Saves**: your own private data for an app. Only you can read yours.
+- **Leaderboards**: a public, shared scoreboard an app submits scores to.
 
 They share nothing. A save is a private box only you can open; a leaderboard is
 a public ranking every player can see.
 
 ## Saves that follow you
 
-When an app saves, the write happens **instantly** on the device you're using,
-then quietly uploads to your Brewser account a moment later. Nothing waits on
-the network, and saving works offline — the upload just happens when you're back
-online.
+When an app saves, the write happens instantly on the device you're using,
+then uploads to your Brewser account a moment later. Nothing waits on the
+network, and saving works offline; the upload happens once you're back online.
 
-Because the copy lives on your account, your progress **follows you across
-devices**. Save on the web, pick it up on the Switch; save on the Switch, pick
+Because the copy lives on your account, your progress follows you across
+devices. Save on the web, pick it up on the Switch; save on the Switch, pick
 it up in your browser.
 
-- **Signed in** — saves sync to your account and appear on your other devices.
-- **Signed out** — saves still work, instantly, but stay only on that device.
-  They sync up once you [sign in](/docs/features/accounts).
+- **Signed in**: saves sync to your account and appear on your other devices.
+- **Signed out**: saves still work, instantly, but stay only on that device.
+  They sync once you [sign in](/docs/features/accounts).
 
-Your saves are **private**. There is no browsing other people's saves, and an
-app only ever sees its own save box — not other apps'.
+Your saves are private. There is no browsing other people's saves, and an
+app only ever sees its own save box, not other apps'.
 
 ## Leaderboards
 
 Some apps post scores to a shared leaderboard so you can see how you stack up.
-Leaderboards are **opt-in by the app** and public: anyone can view the rankings,
-even signed out. To *submit* a score you need to be
+Leaderboards are opt-in by the app and public: anyone can view the rankings,
+even signed out. To submit a score you need to be
 [signed in](/docs/features/accounts), so every entry belongs to a real player.
 
-A leaderboard keeps your **best** result — submitting a worse score never pushes
+A leaderboard keeps your best result. Submitting a worse score never pushes
 you down. Depending on the game, "best" means the highest score (points) or the
 lowest (fastest lap time). You can view the top players, the scores immediately
 around your own rank, or remove your entry entirely.
 
----
-
 ## For developers
 
-Saves and leaderboards are provided by **`brewser.js`**, a tiny drop-in SDK. It
+Saves and leaderboards are provided by `brewser.js`, a tiny drop-in SDK. It
 gives you a two-tier save (instant local + background account sync), a small
-records database layered on top, and a public leaderboard — all under one global
+records database layered on top, and a public leaderboard, all under one global
 `brewser` object.
 
 ### Getting started
@@ -73,37 +70,37 @@ brewser.configure({ packageId: 'com.you.mygame' });
 ```
 
 > **No manifest permission required.** Saves and leaderboards are not hardware,
-> so they need **nothing declared** in your
+> so they need nothing declared in your
 > [manifest](/docs/publishing/manifest). They only depend on the user being
-> signed in for the cloud parts — see [Identity & sign-in](#identity--sign-in).
+> signed in for the cloud parts. See [Identity & sign-in](#identity--sign-in).
 
 ### The two-tier model
 
-Every write goes to **localStorage first** (instant, synchronous, offline-safe),
+Every write goes to localStorage first (instant, synchronous, offline-safe),
 then a debounced background `fetch` pushes it to the account. Reads come from
-localStorage, which **always wins** — the user may have saved offline, or a
-device clock may be wrong, so the local copy is authoritative for that device.
-To bring in a copy made elsewhere, you explicitly `pull()`.
+localStorage, which always wins. The user may have saved offline, or a device
+clock may be wrong, so the local copy is authoritative for that device. To
+bring in a copy made elsewhere, you explicitly `pull()`.
 
-This means: `save()`/`load()` never block and never fail on a bad network;
+This means `save()`/`load()` never block and never fail on a bad network;
 cross-device only happens when you ask for it.
 
 ### Whole-save API
 
-The simplest model — one JSON blob per app, per user.
+The simplest model: one JSON blob per app, per user.
 
 | Call | Returns | Notes |
 | --- | --- | --- |
 | `brewser.save(data)` | `boolean` | `data` = any JSON value. Writes local instantly, schedules a background push. |
 | `brewser.load()` | your data, or `null` | Reads the local copy. Instant. |
 | `brewser.info()` | `{ updatedAt }` or `null` | Timestamp (epoch ms) of the local save. |
-| `brewser.pull(opts)` | `Promise<{ ok, data, updatedAt, reason? }>` | Fetches the **account** copy. Pass `{ adopt: true }` to also write it locally. |
-| `brewser.sync()` | `Promise` | Force an immediate push (skips the debounce) — for a "Sync now" button. |
-| `brewser.clearLocal()` | `boolean` | Clears the local save. Does **not** touch the account copy. |
+| `brewser.pull(opts)` | `Promise<{ ok, data, updatedAt, reason? }>` | Fetches the account copy. Pass `{ adopt: true }` to also write it locally. |
+| `brewser.sync()` | `Promise` | Force an immediate push (skips the debounce); useful for a "Sync now" button. |
+| `brewser.clearLocal()` | `boolean` | Clears the local save. Does not touch the account copy. |
 | `brewser.canSync()` | `boolean` | Whether a cross-device sync is possible right now (i.e. signed in). |
 
-`pull()` deliberately does **not** overwrite local by default — it hands you the
-server copy so *you* decide (e.g. show a "cloud save is newer, load it?" prompt).
+`pull()` deliberately does not overwrite local by default. It hands you the
+server copy so you decide (e.g. show a "cloud save is newer, load it?" prompt).
 Use `{ adopt: true }` when local is empty or the user chose "load from cloud":
 
 ```js
@@ -122,7 +119,7 @@ if (brewser.load() === null) {
 
 A convenience CRUD layer over the one-blob save, treating the blob as an array
 of records. Each record is auto-assigned a unique `id` plus `createdAt` /
-`updatedAt` (epoch ms) — **you never set those**. Every call routes through
+`updatedAt` (epoch ms); you never set those. Every call routes through
 `save()`, so the instant-local + background-sync behaviour applies for free.
 
 | Call | Returns | Notes |
@@ -140,17 +137,17 @@ brewser.list({ sortBy: 'score', desc: true }); // highest first
 brewser.remove(id);
 ```
 
-Records and whole-save are the **same storage** — records just interpret the
-blob as an array. Don't mix a non-array `save()` blob with record helpers on the
-same app; if the blob isn't an array, the record helpers start from an empty
-list rather than throwing.
+Records and whole-save are the same storage; records interpret the blob as an
+array. Don't mix a non-array `save()` blob with record helpers on the same app;
+if the blob isn't an array, the record helpers start from an empty list rather
+than throwing.
 
 ### Leaderboards API
 
-A leaderboard is a **separate entity** from saves: public, ranked, cross-user.
+A leaderboard is a separate entity from saves: public, ranked, cross-user.
 Reach it through `brewser.leaderboards`.
 
-Declare the ranking direction **once at startup**. The server is the source of
+Declare the ranking direction once at startup. The server is the source of
 truth and stores the direction per package.
 
 ```js
@@ -160,13 +157,13 @@ brewser.leaderboards.config({ order: 'asc'  }); // low wins (e.g. lap times)
 
 | Call | Returns | Auth | Notes |
 | --- | --- | --- | --- |
-| `.config({ order })` | the leaderboards object | — | `'desc'` high-wins (default) or `'asc'` low-wins. Call once. |
-| `.order()` | `'desc' \| 'asc'` | — | The direction currently declared on the client. |
-| `.submit(score, { name })` | `Promise<{ ok, best, rank, updated, onBoard }>` | **signed in** | Best-kept: a worse score never lowers your standing. |
+| `.config({ order })` | the leaderboards object | none | `'desc'` high-wins (default) or `'asc'` low-wins. Call once. |
+| `.order()` | `'desc' \| 'asc'` | none | The direction currently declared on the client. |
+| `.submit(score, { name })` | `Promise<{ ok, best, rank, updated, onBoard }>` | signed in | Best-kept: a worse score never lowers your standing. |
 | `.list(n = 10)` | `Promise<{ ok, order, count, top, me? }>` | public | Top N. Works signed-out; signed in, each row carries `isMe`. |
-| `.aroundMe(n = 3)` | `Promise<{ ok, order, count, top, me, window }>` | **signed in** | The `window` of rows n above/below the user. |
-| `.me()` | `Promise<{ ok, me }>` | **signed in** | `me` = `{ rank, score }` or `null` if unranked. |
-| `.remove()` | `Promise<{ ok }>` | **signed in** | Deletes the user's **own** entry. |
+| `.aroundMe(n = 3)` | `Promise<{ ok, order, count, top, me, window }>` | signed in | The `window` of rows n above/below the user. |
+| `.me()` | `Promise<{ ok, me }>` | signed in | `me` = `{ rank, score }` or `null` if unranked. |
+| `.remove()` | `Promise<{ ok }>` | signed in | Deletes the user's own entry. |
 
 Each row in `top` / `window` carries `rank`, `name`, `score`, and `isMe` (only
 when the caller is signed in). On `submit`, `best` is the score now stored,
@@ -177,28 +174,28 @@ the score fell below the visible cutoff.
 brewser.leaderboards.config({ order: 'desc' });
 
 brewser.leaderboards.submit(1200, { name: 'Alice' }).then(res => {
-  if (!res.ok) { /* res.reason === 'unauth' → prompt sign-in */ return; }
+  if (!res.ok) { /* res.reason === 'unauth' means prompt sign-in */ return; }
   console.log(res.updated ? 'New best!' : 'Kept your previous best', res.rank);
 });
 
 brewser.leaderboards.list(10).then(r => {
   if (!r.ok) return;
   r.top.forEach(row => {
-    console.log(`#${row.rank} ${row.name || '(anon)'} — ${row.score}` + (row.isMe ? ' ← you' : ''));
+    console.log(`#${row.rank} ${row.name || '(anon)'}: ${row.score}` + (row.isMe ? ' (you)' : ''));
   });
 });
 ```
 
-`list()` is safe signed-out (it just can't flag which row is "you"); everything
-that writes or is user-specific — `submit`, `aroundMe`, `me`, `remove` — needs
+`list()` is safe signed-out (it can't flag which row is "you"); everything
+that writes or is user-specific (`submit`, `aroundMe`, `me`, `remove`) needs
 sign-in and resolves with `{ ok: false, reason: 'unauth' }` otherwise.
 
 ### Identity & sign-in
 
 Cross-device sync and every authenticated leaderboard call need the user signed
-in via [Brewser Auth](/docs/features/accounts). **Inside the Brewser player the
-token arrives automatically** — your app doesn't manage auth. The SDK finds it in
-this order:
+in via [Brewser Auth](/docs/features/accounts). Inside the Brewser player the
+token arrives automatically, so your app doesn't manage auth. The SDK finds it
+in this order:
 
 1. A token you handed in via `brewser.configure({ token })`.
 2. `window.__brewserAuthToken()`, exposed by the navigator.
@@ -209,7 +206,7 @@ Signed out, saves are still instant and local and will sync once the user signs
 in; leaderboard `list()` still works. Use `brewser.canSync()` to reflect state in
 your UI (e.g. enable a "Sync now" button only when it will do something).
 
-### Reacting to sync — `onSync`
+### Reacting to sync with `onSync`
 
 Pass an `onSync(status, extra)` callback to surface sync state. `status` is one
 of `'pushing'`, `'synced'`, `'offline'`, `'unauth'`, `'error'`:
@@ -218,8 +215,8 @@ of `'pushing'`, `'synced'`, `'offline'`, `'unauth'`, `'error'`:
 brewser.configure({
   onSync(status, extra) {
     if (status === 'synced')  setBadge('Saved to cloud');
-    if (status === 'offline') setBadge('Offline — will sync later');
-    if (status === 'unauth')  setBadge('Signed out — saved locally only');
+    if (status === 'offline') setBadge('Offline, will sync later');
+    if (status === 'unauth')  setBadge('Signed out, saved locally only');
     if (status === 'error')   console.warn('Sync error', extra.error);
   }
 });
@@ -232,7 +229,7 @@ brewser.configure({
 | Option | Default | Purpose |
 | --- | --- | --- |
 | `packageId` | auto from URL | Identifies your app's save box & board. |
-| `token` | — | Hand in an auth token explicitly. |
+| `token` | none | Hand in an auth token explicitly. |
 | `onSync` | `null` | Sync-status callback (see above). |
 | `apiBase` | `https://brewser.io/wp-json/brewser/v1` | Save/leaderboard API root. |
 | `nsPrefix` | `brewser_save_` | localStorage key prefix. |
@@ -240,8 +237,8 @@ brewser.configure({
 
 ### Putting it together
 
-A minimal but complete integration — load on boot, save on change, submit a
-score, show the top 10:
+A minimal but complete integration that loads on boot, saves on change, submits
+a score, and shows the top 10:
 
 ```js
 brewser.leaderboards.config({ order: 'desc' });
@@ -271,21 +268,21 @@ function onLevelComplete(level, score) {
 ### Gotchas
 
 - **localStorage wins on read.** `load()` never reflects a newer server copy on
-  its own — call `pull()` to bring one in. Design boot flow accordingly.
+  its own. Call `pull()` to bring one in. Design boot flow accordingly.
 - **`pull()` doesn't adopt by default.** Without `{ adopt: true }` it only
   returns the server copy; local is untouched.
-- **Best-kept scores.** Re-submitting a lower score is a no-op on your standing —
-  don't build UI that assumes the latest submit is your current rank; read
+- **Best-kept scores.** Re-submitting a lower score is a no-op on your standing.
+  Don't build UI that assumes the latest submit is your current rank; read
   `res.best` / `res.rank`.
 - **Debounced pushes.** Rapid `save()` calls coalesce into one push after
-  `pushDebounceMs`. Use `sync()` when you need it up *now* (e.g. before a level
+  `pushDebounceMs`. Use `sync()` when you need it up now (e.g. before a level
   hand-off or a "Sync now" button).
 - **Record ids are the SDK's.** Never set `id`/`createdAt`/`updatedAt` yourself;
   `update()` refuses to change `id` and `createdAt`.
 
 ## See also
 
-- **[Accounts & Sign-in](/docs/features/accounts)** — the auth the cloud parts
+- [Accounts & Sign-in](/docs/features/accounts): the auth the cloud parts
   depend on, including on the Switch.
-- **[Manifest & Permissions](/docs/publishing/manifest)** — why these features
+- [Manifest & Permissions](/docs/publishing/manifest): why these features
   need nothing declared.

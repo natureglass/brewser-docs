@@ -10,14 +10,14 @@ worked examples and gotchas.
 
 ## It's a file you ship, not a runtime API
 
-Brewser makes a point of *not* having proprietary `brewser.*` runtime globals — apps stay portable,
-and **if it runs on Brewser it runs in Chrome**. `brewser.js` keeps that promise: it's an ordinary
-script **you bundle with your app**, not something the runtime injects. It installs one global,
-`brewser`, and degrades gracefully everywhere:
+Brewser makes a point of not having proprietary `brewser.*` runtime globals, so apps stay portable:
+if it runs on Brewser it runs in Chrome. `brewser.js` keeps that promise. It's an ordinary script
+you bundle with your app, not something the runtime injects. It installs one global, `brewser`, and
+degrades gracefully in every environment:
 
-- **Signed out** — `save()`/`load()` still work instantly against local storage; cloud sync just
-  waits until the user signs in. `leaderboards.list()` still works (it's public).
-- **In a desktop browser** — the same file runs; the cloud calls hit the same public API.
+- **Signed out**: `save()`/`load()` still work instantly against local storage; cloud sync waits
+  until the user signs in. `leaderboards.list()` still works (it's public).
+- **In a desktop browser**: the same file runs, and the cloud calls hit the same public API.
 
 Ship it and include it before your own script:
 
@@ -32,7 +32,7 @@ Ship it and include it before your own script:
 The SDK auto-detects your **package id** from the catalogue URL (`.../apps/{group}/{id}/...`). If
 you're serving from somewhere else, set it: `brewser.configure({ packageId: 'com.you.mygame' })`.
 
-The only cloud dependency is the user being [signed in](/docs/features/accounts) — nothing here
+The only cloud dependency is the user being [signed in](/docs/features/accounts); nothing here
 needs a [manifest permission](/docs/publishing/manifest).
 
 ## API at a glance
@@ -44,17 +44,17 @@ gotchas are in [Saves & Leaderboards](/docs/features/saves-and-leaderboards).
 
 | Call | Returns | Auth |
 | --- | --- | --- |
-| `brewser.save(data)` | `boolean` — writes local instantly, schedules a cloud push | works signed-out (local); cloud needs sign-in |
-| `brewser.load()` | your data or `null` | — |
-| `brewser.info()` | `{ updatedAt }` or `null` | — |
-| `brewser.pull(opts)` | `Promise<{ ok, data, updatedAt, reason? }>` — the account copy; `{ adopt: true }` also writes it locally | signed in |
-| `brewser.sync()` | `Promise` — force an immediate push | signed in |
-| `brewser.clearLocal()` | `boolean` — clears local only | — |
-| `brewser.canSync()` | `boolean` — is a cross-device sync possible now | — |
+| `brewser.save(data)` | `boolean` (writes local instantly, schedules a cloud push) | works signed-out (local); cloud needs sign-in |
+| `brewser.load()` | your data or `null` | none |
+| `brewser.info()` | `{ updatedAt }` or `null` | none |
+| `brewser.pull(opts)` | `Promise<{ ok, data, updatedAt, reason? }>` (the account copy; `{ adopt: true }` also writes it locally) | signed in |
+| `brewser.sync()` | `Promise` (force an immediate push) | signed in |
+| `brewser.clearLocal()` | `boolean` (clears local only) | none |
+| `brewser.canSync()` | `boolean` (whether a cross-device sync is possible now) | none |
 
 ### Records (CRUD over the save blob)
 
-The SDK stamps `id`, `createdAt`, `updatedAt` — you never set those.
+The SDK stamps `id`, `createdAt`, and `updatedAt`; you never set those.
 
 | Call | Returns |
 | --- | --- |
@@ -62,19 +62,19 @@ The SDK stamps `id`, `createdAt`, `updatedAt` — you never set those.
 | `brewser.get(id)` | record or `null` |
 | `brewser.update(id, changes)` | updated record or `null` |
 | `brewser.remove(id)` | `boolean` |
-| `brewser.list(opts)` | `object[]` — `opts = { sortBy, desc }` |
+| `brewser.list(opts)` | `object[]` (`opts = { sortBy, desc }`) |
 
 ### Leaderboards (`brewser.leaderboards`)
 
 | Call | Returns | Auth |
 | --- | --- | --- |
-| `.config({ order })` | the leaderboards object — `'desc'` (default) or `'asc'` | — |
-| `.order()` | `'desc' \| 'asc'` | — |
-| `.submit(score, { name })` | `Promise<{ ok, best, rank, updated, onBoard }>` — best-kept | signed in |
+| `.config({ order })` | the leaderboards object; `'desc'` (default) or `'asc'` | none |
+| `.order()` | `'desc' \| 'asc'` | none |
+| `.submit(score, { name })` | `Promise<{ ok, best, rank, updated, onBoard }>` (best-kept) | signed in |
 | `.list(n = 10)` | `Promise<{ ok, order, count, top, me? }>` | public |
 | `.aroundMe(n = 3)` | `Promise<{ ok, order, count, top, me, window }>` | signed in |
 | `.me()` | `Promise<{ ok, me }>` | signed in |
-| `.remove()` | `Promise<{ ok }>` — deletes your own entry | signed in |
+| `.remove()` | `Promise<{ ok }>` (deletes your own entry) | signed in |
 
 Authenticated calls that fail for lack of sign-in resolve with `{ ok: false, reason: 'unauth' }`
 rather than throwing. Other failure reasons: `'offline'`, `'server'`, `'nothing-local'`,
@@ -87,7 +87,7 @@ Merges options and returns `brewser`:
 | Option | Default | Purpose |
 | --- | --- | --- |
 | `packageId` | auto from URL | Your app's save box & board. |
-| `token` | — | Provide an auth token explicitly. |
+| `token` | none | Provide an auth token explicitly. |
 | `onSync` | `null` | Sync-status callback: `'pushing' \| 'synced' \| 'offline' \| 'unauth' \| 'error'`. |
 | `apiBase` | `https://brewser.io/wp-json/brewser/v1` | The save/leaderboard API root. |
 | `nsPrefix` | `brewser_save_` | localStorage key prefix. |
@@ -95,20 +95,20 @@ Merges options and returns `brewser`:
 
 ## Service limits
 
-The cloud API enforces a few limits, worth designing around:
+The cloud API enforces a few limits:
 
 | | Limit |
 | --- | --- |
 | Save blob size | 256 KB per app, per user |
 | Save writes | ~60 per minute per user |
-| Leaderboard | keeps your **best**; a worse score never lowers you |
+| Leaderboard | keeps your best; a worse score never lowers you |
 | Leaderboard entries retained | ~100 per app |
 | Leaderboard submits | ~30 per minute per user |
 | Score range | `\|score\| ≤ 1e12` |
 
-## Sign-in, and the on-device seam
+## Sign-in and the on-device token
 
-Inside the Brewser player your app doesn't manage auth — the SDK finds the token for you, in order:
+Inside the Brewser player your app doesn't manage auth. The SDK finds the token for you, in order:
 
 1. a token you passed to `brewser.configure({ token })`;
 2. `window.__brewserAuthToken()`, if the host page exposes it;
@@ -116,10 +116,10 @@ Inside the Brewser player your app doesn't manage auth — the SDK finds the tok
 
 {/* TODO(verify): on the Switch the runtime exposes the signed-in session at localStorage['brewser_auth'].token; a runtime-side brewser.login() bridge is designed but not yet wired, so an app's authenticated cloud sync on-device depends on the SDK build reading that key. Confirm once the on-device auth bridge lands. */}
 
-Signature verification of the token happens on the server — the SDK and runtime never decode it.
+Signature verification of the token happens on the server; the SDK and runtime never decode it.
 
 ## Related
 
-- [Saves & Leaderboards](/docs/features/saves-and-leaderboards) — the full guide with examples.
-- [Accounts & Sign-in](/docs/features/accounts) — the auth the cloud parts depend on.
-- [Manifest Reference](/docs/publishing/manifest) — why these features need nothing declared.
+- [Saves & Leaderboards](/docs/features/saves-and-leaderboards): the full guide with examples.
+- [Accounts & Sign-in](/docs/features/accounts): the auth the cloud parts depend on.
+- [Manifest Reference](/docs/publishing/manifest): why these features need nothing declared.

@@ -6,13 +6,13 @@ description: Every field in a Brewser app manifest, and how it's generated
 Every Brewser app ships a `manifest.json` describing its identity, the capabilities it needs, and
 how it should behave on the console. This page is the field-by-field reference.
 
-## You don't hand-write it — Brewser generates it
+## Brewser generates the manifest for you
 
-Here's the part that trips people up: **you never author the published manifest by hand.** You fill
+You never author the published manifest by hand. You fill
 in the [submission form](/docs/publishing/submission) on brewser.io, and Brewser builds a
-validated `manifest.json` from your answers. The manifest below is what comes *out* of that
-process and ships inside your app on the SD card — it's useful to understand, but the form is where
-you actually set these values.
+validated `manifest.json` from your answers. The manifest below is what comes out of that
+process and ships inside your app on the SD card. It's useful to understand, but the form is where
+you set these values.
 
 The submission side validates every field against a strict schema (unknown fields are rejected), so
 a malformed manifest can't reach the catalogue.
@@ -50,7 +50,7 @@ This is the generated manifest for the [Save Demo](https://play.brewser.io) app
 
 | Field | Required | Type | Notes |
 | --- | --- | --- | --- |
-| `id` | Yes | string | `com.<publisher>.<app>`, lowercase. Stable — don't change it between versions. |
+| `id` | Yes | string | `com.<publisher>.<app>`, lowercase. Stable, so don't change it between versions. |
 | `name` | Yes | string | User-facing name. Don't impersonate other products. |
 | `version` | Yes | string | Semantic version, e.g. `1.2.0`. |
 | `description` | Yes | string | Rich text with a small HTML allowlist (`p`, `br`, `strong`, `em`, `ul`/`ol`/`li`, `code`, `a`). |
@@ -58,7 +58,7 @@ This is the generated manifest for the [Save Demo](https://play.brewser.io) app
 | `logo` | Yes | string | Relative path to your icon/banner inside the bundle. |
 | `entry` | Yes | string | The first file Brewser opens. Defaults to `index.html`; must exist in the bundle. |
 | `categories` | Yes | string[] | One or more catalogue categories. |
-| `permissions` | Yes | string[] | Declared capabilities — see [below](#permissions). May be empty. |
+| `permissions` | Yes | string[] | Declared capabilities; see [below](#permissions). May be empty. |
 | `compatibility` | Yes | string[] | Where the app runs: `switch`, `web`, `mobile`. |
 | `allowed_origins` | Yes | string[] | External `https?://` hosts the app is allowed to reach. Empty if it makes no network calls. |
 | `developer` | Yes | string | Your publisher display name. |
@@ -70,23 +70,23 @@ This is the generated manifest for the [Save Demo](https://play.brewser.io) app
 | `publishedAt` | Yes | string | ISO timestamp, set once at first publish and carried forward. |
 | `tags` | No | string[] | Free-form tags for discovery. |
 | `genre` / `features` | No | string[] | Curated genre and feature labels. |
-| `buttonMapping` | No | object | Maps keyboard keys to Switch controls — see [Controls](/docs/runtime/controls). |
+| `buttonMapping` | No | object | Maps keyboard keys to Switch controls; see [Controls](/docs/runtime/controls). |
 
 > Field values like `categories`, `license`, `genre` and `features` are validated against curated
 > lists on the platform, so the form offers you the valid choices rather than free text.
 
 ## Permissions
 
-`permissions` is a list of the capabilities your app declares up front. Users see them **before**
-launching, and the runtime uses them to decide what your app may touch — network access, local
-storage, device info, account access, and so on. Requesting a capability your app doesn't use just
-adds friction, so **declare the minimum you need**. Apps that request nothing skip the permission
-prompt entirely and offer the smoothest click-to-play experience.
+`permissions` is a list of the capabilities your app declares up front. Users see them before
+launching, and the runtime uses them to decide what your app may touch: network access, local
+storage, device info, account access, and so on. Requesting a capability your app doesn't use only
+adds friction, so declare the minimum you need. Apps that request nothing skip the permission
+prompt entirely, so users can launch them directly.
 
 Hardware access (USB, Bluetooth, and the other device APIs covered in
-[Hardware APIs](/docs/runtime/hardware-apis)) is declared here too. Declaring a peripheral says
-*"this app talks to hardware of this kind"*; choosing a **specific** device — filtering by USB
-vendor/product id, or by Bluetooth service UUID — happens in your app's own `requestDevice()` call,
+[Hardware APIs](/docs/runtime/hardware-apis)) is declared here too. Declaring a peripheral says that
+the app talks to hardware of a given kind. Choosing a specific device (filtering by USB
+vendor/product id, or by Bluetooth service UUID) happens in your app's own `requestDevice()` call,
 exactly as it does in Chrome. Those filters live in your JavaScript, not in the manifest.
 
 > The exact set of permission names is a curated list maintained by Brewser, so it can grow over
@@ -96,7 +96,7 @@ exactly as it does in Chrome. Those filters live in your JavaScript, not in the 
 
 ### Network needs two things
 
-If your app reaches the internet, it needs both a network capability **and** every external host
+If your app reaches the internet, it needs both a network capability and every external host
 listed in `allowed_origins`:
 
 ```json
@@ -106,18 +106,18 @@ listed in `allowed_origins`:
 ]
 ```
 
-The security scanner cross-checks the hosts your code actually contacts against this list — an
+The security scanner cross-checks the hosts your code actually contacts against this list; an
 undeclared host is flagged. See [Networking in Apps](/docs/runtime/networking) for what the runtime
 can reach, and [Security Review](/docs/publishing/security-review) for how the check works.
 
 ## What doesn't need declaring
 
-Platform features like [Saves & Leaderboards](/docs/features/saves-and-leaderboards) need **nothing**
-in the manifest — they're not hardware. They work through the [`brewser.js` SDK](/docs/features/brewser-sdk)
+Platform features like [Saves & Leaderboards](/docs/features/saves-and-leaderboards) need nothing
+in the manifest; they're not hardware. They work through the [`brewser.js` SDK](/docs/features/brewser-sdk)
 and only depend on the user being [signed in](/docs/features/accounts) for their cloud parts.
 
 ## Related
 
-- [Quickstart](/docs/publishing/quickstart) — where these values get filled in.
-- [Content & Submission Policy](/docs/publishing/policy) — what's allowed.
-- [Controls](/docs/runtime/controls) — `exitGame` and `buttonMapping`.
+- [Quickstart](/docs/publishing/quickstart): where these values get filled in.
+- [Content & Submission Policy](/docs/publishing/policy): what's allowed.
+- [Controls](/docs/runtime/controls): `exitGame` and `buttonMapping`.

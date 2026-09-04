@@ -3,84 +3,83 @@ title: Audio & Media
 description: Web Audio, audio and video elements, and the codecs that actually decode
 ---
 
-Brewser has real audio and video support — Web Audio for synthesis and analysis, `<audio>` and
-`<video>` elements for playback, and a broad set of codecs. Audio and video play back well across
-the formats below; because decoding runs in **software**, the one thing to watch is very
-high-bandwidth video, which can stutter.
+Brewser has audio and video support: Web Audio for synthesis and analysis, `<audio>` and
+`<video>` elements for playback, and a broad set of codecs. Playback works well across the formats
+below. Because decoding runs in software, the main thing to watch for is very high-bandwidth video,
+which can stutter.
 
 ## Web Audio
 
-The core of the Web Audio API is real and hardware-backed. These nodes work as you'd expect:
+The core of the Web Audio API is real and hardware-backed. These nodes are fully supported:
 
 - `AudioContext` / `OfflineAudioContext`, `AudioDestinationNode`
 - `GainNode`, `StereoPannerNode`, `AudioBufferSourceNode`, `OscillatorNode`
-- **`AnalyserNode`** — real time/frequency data, so spectrum visualisers work
+- `AnalyserNode`: real time/frequency data, so spectrum visualisers work
 - `AudioParam` automation and `decodeAudioData`
 
 Some less-common nodes are shimmed for compatibility so capability-probing apps don't crash: filter,
 convolver and panner nodes pass audio through unprocessed, and a few others (delay, compressor,
-wave-shaper, script processor) are present but inert. `connect()` is lenient — an unsupported
-connection is a no-op rather than a thrown error — so libraries that build large graphs keep
-working. Build your core sound on the real nodes above and you're on solid ground.
+wave-shaper, script processor) are present but inert. `connect()` is lenient: an unsupported
+connection is a no-op rather than a thrown error, so libraries that build large graphs keep working.
 
-**`new Audio()` works** for sound effects and music (whole-file decode).
+`new Audio()` works for sound effects and music (whole-file decode).
 
 ## `<audio>` and `<video>` elements
 
 HTML `<audio>` and `<video>` elements play through the runtime's media pipeline. `canPlayType()`
-answers honestly, returning `"maybe"` for the container/codec combinations it can decode.
+returns `"maybe"` for the container/codec combinations it can decode.
 
-Media can come from local files, blobs, and the network — including **HLS streams** over HTTPS (see
+Media can come from local files, blobs, and the network, including HLS streams over HTTPS (see
 [Networking](/docs/runtime/networking)).
 
-There are no subtitle or text tracks yet — `<track>` elements are ignored, so plan for burned-in
+There are no subtitle or text tracks yet. `<track>` elements are ignored, so plan for burned-in
 captions if you need them.
 
 ## Codec support
 
 Playback works well for the formats below. Decoding is done in software (via FFmpeg), so the codec
-list is broad and the practical limit is **bandwidth**: high-bitrate or high-resolution video —
-1080p, and heavier codecs like VP9 and AV1 — can drop frames on the Tegra X1. Prefer H.264 at 720p
-for the smoothest video.
+list is broad and the practical limit is bandwidth: high-bitrate or high-resolution video (1080p,
+and heavier codecs like VP9 and AV1) can drop frames on the Tegra X1. Prefer H.264 at 720p for the
+smoothest video.
 
 ### Video
 
 | Codec | Decodes | Notes |
 | --- | --- | --- |
-| H.264 / AVC | ✅ | Best choice; smooth at 720p |
-| H.265 / HEVC | ✅ | Works; HD is performance-limited |
-| VP8 | ✅ | |
-| VP9 | ✅ | Performance-limited |
-| AV1 | ✅ | Performance-limited |
-| MPEG-1/2/4, VC-1, Theora | ✅ | Software-decoded |
+| H.264 / AVC | Yes | Best choice; smooth at 720p |
+| H.265 / HEVC | Yes | Works; HD is performance-limited |
+| VP8 | Yes | |
+| VP9 | Yes | Performance-limited |
+| AV1 | Yes | Performance-limited |
+| MPEG-1/2/4, VC-1, Theora | Yes | Software-decoded |
 
 ### Audio
 
 | Codec | Decodes |
 | --- | --- |
-| MP3 | ✅ |
-| AAC / M4A | ✅ |
-| Ogg Vorbis | ✅ |
-| Opus | ✅ |
-| FLAC | ✅ |
-| WAV / PCM | ✅ |
-| AC3/EAC3, ALAC, WMA | ✅ |
+| MP3 | Yes |
+| AAC / M4A | Yes |
+| Ogg Vorbis | Yes |
+| Opus | Yes |
+| FLAC | Yes |
+| WAV / PCM | Yes |
+| AC3/EAC3, ALAC, WMA | Yes |
 
 > Video decodes on the CPU (the hardware video block isn't engaged in this build), so a very
-> high-bandwidth stream is the most likely thing to stutter — not any particular codec. In testing,
+> high-bandwidth stream is the most likely thing to stutter, not any particular codec. In testing,
 > everything plays; only high-bandwidth video suffers.
 
-## See it in action
+## Example apps
 
-- **`com.natureglass.spectraplay`** — a Web Audio spectrum visualiser reading an `<audio>` element
+- `com.natureglass.spectraplay`: a Web Audio spectrum visualiser reading an `<audio>` element
   through an `AnalyserNode`, rendered with WebGL 2.
-- **`com.natureglass.streamcast`** — a `<video>` player pulling a live HLS stream.
+- `com.natureglass.streamcast`: a `<video>` player pulling a live HLS stream.
 
 Browse them at [play.brewser.io](https://play.brewser.io).
 
 ## Related
 
-- [Engine Status](/docs/engine-status) — how complete audio & video are, with the coverage numbers.
-- [Networking in Apps](/docs/runtime/networking) — streaming media over the network.
-- [Performance](/docs/tips/performance) — getting smooth playback on Tegra X1.
+- [Engine Status](/docs/engine-status): how complete audio & video are, with the coverage numbers.
+- [Networking in Apps](/docs/runtime/networking): streaming media over the network.
+- [Performance](/docs/tips/performance): getting smooth playback on Tegra X1.
 - [Known Limitations](/docs/support/limitations).

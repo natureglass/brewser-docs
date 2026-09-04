@@ -3,10 +3,10 @@ title: Styles
 description: The CSS that colours and lays out the shell's own pages
 ---
 
-A **style** is the stylesheet applied to Brewser's own pages — the home page,
+A **style** is the stylesheet applied to Brewser's own pages: the home page,
 the app catalogue, Settings, and the built-in dialogs. Styles are listed in
-`themes/styles.json`, and each one is a single CSS file. The picker lives in
-**Settings → Style**.
+`themes/styles.json`, and each one is a single CSS file. The picker is the
+**Style** setting.
 
 ```json title="themes/styles.json"
 [
@@ -36,9 +36,9 @@ The quickest route is to copy a shipped style and recolour it:
    ```json
    { "title": "My Theme", "path": "themes/styles/my-theme.css" }
    ```
-4. Pick **My Theme** in **Settings → Style**, Save.
+4. Pick **My Theme** in the **Style** setting and Save.
 
-A minimal style only needs to set the body and a few text colours — everything
+A minimal style only needs to set the body and a few text colours; everything
 else inherits:
 
 ```css title="themes/styles/my-theme.css"
@@ -61,18 +61,18 @@ h2 { color: #7aa2ff; }   /* section heads */
 a  { color: #7eda9f; }   /* links         */
 ```
 
-### Things to keep in mind
+### Guidelines
 
-- **Keep `body` transparent** if you want your [wallpaper](/docs/customize/backgrounds)
-  to be visible — the shell paints the background behind the page, and a solid
+- Keep `body` transparent if you want your [wallpaper](/docs/customize/backgrounds)
+  to be visible: the shell paints the background behind the page, and a solid
   body colour hides it.
-- **Style and wallpaper are independent.** Changing the Style doesn't change the
+- Style and wallpaper are independent. Changing the Style doesn't change the
   Background and vice-versa, so a dark CSS theme can sit over any wallpaper.
-- **Favour flat colours over gradients and shadows.** The shell is composited on
+- Favour flat colours over gradients and shadows. The shell is composited on
   a low-end GPU path where gradients, box-shadows and transitions are expensive;
   the shipped styles deliberately use flat fills to stay smooth. See
   [Performance](/docs/tips/performance).
-- **A broken path is skipped**, and if the whole style can't load the shell
+- A broken path is skipped, and if the whole style can't load the shell
   falls back to its baked-in default, so a typo can't leave you with an unstyled
   screen.
 
@@ -81,7 +81,7 @@ and make good starting points.
 
 ## Related
 
-- [Backgrounds & shaders](/docs/customize/backgrounds) — the wallpaper that
+- [Backgrounds & shaders](/docs/customize/backgrounds): the wallpaper that
   sits behind your styled pages.
-- [Toolbars](/docs/customize/toolbars) — the browser chrome is styled by its
+- [Toolbars](/docs/customize/toolbars): the browser chrome is styled by its
   own HTML file, separately from the page style.

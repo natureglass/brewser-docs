@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: 'Brewser Docs',
   },
   description:
-    'Documentation for Brewser — the web runtime for Nintendo Switch homebrew.',
+    'Documentation for Brewser, the web runtime for Nintendo Switch homebrew.',
 };
 
 // To use a Google font instead of the system stack, restore:

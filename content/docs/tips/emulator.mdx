@@ -3,17 +3,17 @@ title: Developing on an Emulator
 description: Where an emulator helps, and where it will mislead you
 ---
 
-Brewser can run under a Nintendo Switch emulator, which makes for a convenient middle step between
-Chrome and real hardware — with some important limits. The short version: **Chrome is your primary
+Brewser can run under a Nintendo Switch emulator, which makes a convenient middle step between
+Chrome and real hardware, with some important limits. In short: Chrome is your primary
 loop, an emulator is a secondary check for Switch-specific UI and input, and real hardware is the
-only source of truth for networking, graphics and performance.**
+only source of truth for networking, graphics, and performance.
 
 ## What an emulator is good for
 
-- **UI and layout** at the real resolution, in the real fullscreen canvas.
-- **Gamepad and navigation** flow — checking your app is usable with a controller before you touch
+- UI and layout at the real resolution, in the real fullscreen canvas.
+- Gamepad and navigation flow: checking your app is usable with a controller before you touch
   hardware.
-- **Logic and boot** — confirming the app loads and runs in the runtime, not just in a browser.
+- Logic and boot: confirming the app loads and runs in the runtime, not just in a browser.
 
 ## What an emulator will *not* tell you
 
@@ -21,24 +21,24 @@ only source of truth for networking, graphics and performance.**
   anything that uses `fetch`, WebSocket, accounts, or cloud [saves and
   leaderboards](/docs/features/saves-and-leaderboards) won't behave as it does on a real console.
   Test [networking](/docs/runtime/networking) on hardware.
-- **Graphics fidelity.** The Switch's GPU driver stack renders differently from an emulator's — a
-  scene that looks right in an emulator can differ on hardware (and vice-versa). Never sign off on
+- **Graphics fidelity.** The Switch's GPU driver stack renders differently from an emulator's: a
+  scene that looks right in an emulator can differ on hardware, and vice versa. Never sign off on
   visuals from an emulator alone.
 - **Performance.** Frame rates in an emulator (fast or slow) tell you little about the Tegra X1.
   Do [performance](/docs/tips/performance) work on the device.
 
 ## A sensible workflow
 
-1. **Chrome** — build and debug with full DevTools.
-2. **Emulator** — sanity-check UI, fullscreen layout, and controller input in the runtime.
-3. **Real hardware** — the final word on networking, graphics and performance, and the only place
+1. **Chrome**: build and debug with full DevTools.
+2. **Emulator**: sanity-check UI, fullscreen layout, and controller input in the runtime.
+3. **Real hardware**: the final word on networking, graphics, and performance, and the only place
    to trust the result.
 
 > Whatever you use, the compatibility promise still holds: if it behaves differently from Chrome,
-> that's a bug worth [reporting](/docs/support) — with a note on where you saw it (emulator vs
+> that's a bug worth [reporting](/docs/support), with a note on where you saw it (emulator vs
 > hardware), since the two can diverge.
 
 ## Related
 
-- [Debugging & Testing](/docs/tips/debugging) — the Chrome-first loop and on-device logging.
-- [Known Limitations](/docs/support/limitations) — what's still a work in progress.
+- [Debugging & Testing](/docs/tips/debugging): the Chrome-first loop and on-device logging.
+- [Known Limitations](/docs/support/limitations): what's still a work in progress.

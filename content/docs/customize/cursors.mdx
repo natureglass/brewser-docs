@@ -3,10 +3,10 @@ title: Cursors
 description: The images used for each mouse cursor shape, with hotspots
 ---
 
-Brewser draws a software mouse cursor, and every cursor shape — the arrow, the
-hand pointer, the text beam, the resize arrows, the busy spinner — is an image
+Brewser draws a software mouse cursor, and every cursor shape (the arrow, the
+hand pointer, the text beam, the resize arrows, the busy spinner) is an image
 you can replace. Unlike the other categories there's no picker: `cursors.json`
-defines the **whole set at once**, mapping each CSS cursor keyword to an image.
+defines the whole set at once, mapping each CSS cursor keyword to an image.
 
 ```json title="themes/cursors.json"
 [
@@ -19,10 +19,10 @@ defines the **whole set at once**, mapping each CSS cursor keyword to an image.
 
 | Field | Required | Meaning |
 | --- | --- | --- |
-| `name` | Yes | The **CSS cursor keyword** this image is used for (`default`, `pointer`, `text`, `grab`, `not-allowed`, the `*-resize` shapes, …). |
+| `name` | Yes | The CSS cursor keyword this image is used for (`default`, `pointer`, `text`, `grab`, `not-allowed`, the `*-resize` shapes, and so on). |
 | `image` | Yes | The cursor image, relative to `sdmc:/switch/brewser/`. `.png` or animated `.apng`. |
-| `x` | — | Hotspot X — the pixel in the image that's the actual click point. |
-| `y` | — | Hotspot Y. |
+| `x` | No | Hotspot X, the pixel in the image that's the actual click point. |
+| `y` | No | Hotspot Y. |
 
 Whenever a page (or the shell) asks for a given CSS `cursor:` value, Brewser
 looks up the matching `name` and draws that image, offset by its hotspot so the
@@ -32,7 +32,7 @@ click lands where the user expects.
 
 Because it's one shared set, there are two ways to reskin:
 
-**Replace the images.** Keep the JSON as-is and just overwrite the PNGs in
+**Replace the images.** Keep the JSON as-is and overwrite the PNGs in
 `themes/cursors/` with your own art (same filenames). This is the simplest way
 to get a whole new cursor look.
 
@@ -45,18 +45,17 @@ shape you want:
 
 ### Getting the hotspot right
 
-The hotspot is the single pixel that counts as "where you clicked". For an arrow
-it's the tip; for a hand pointer it's the fingertip; for a crosshair or resize
-handle it's the centre. If clicks feel off by a few pixels, adjust `x`/`y`. The
-shipped cursor art is drawn on a 48×48 canvas, so hotspot values are in that
-range.
+The hotspot is the pixel that counts as the click point: the tip of an arrow,
+the fingertip of a hand pointer, or the centre of a crosshair or resize handle.
+If clicks feel off by a few pixels, adjust `x`/`y`. The shipped cursor art is
+drawn on a 48×48 canvas, so hotspot values are in that range.
 
-> **Animated cursors** are supported: use an `.apng` (animated PNG) for shapes
-> like `wait`/`progress` to get a spinner. A regular `.png` is a still cursor.
+> **Animated cursors.** Use an `.apng` (animated PNG) for shapes like
+> `wait`/`progress` to get a spinner; a regular `.png` is a still cursor.
 
 ## Related
 
-- [Toolbars](/docs/customize/toolbars) — toolbar icons live alongside cursor art
+- [Toolbars](/docs/customize/toolbars): toolbar icons live alongside cursor art
   under `themes/`.
-- [Controls](/docs/runtime/controls) — how the software cursor is driven, and
+- [Controls](/docs/runtime/controls): how the software cursor is driven, and
   the manifest flags that hide it in docked/handheld modes.

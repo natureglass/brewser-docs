@@ -1,12 +1,12 @@
 ---
 title: Toolbars
-description: The browser chrome strip — buttons, URL bar, position and height
+description: The browser chrome strip and its buttons, URL bar, position and height
 ---
 
 The toolbar is the browser chrome strip: back/forward/reload/home, the bookmark
-star, the URL bar, and the Settings and account buttons. It's a small **HTML
-file**, so you have full control over its layout and look. Toolbars are listed
-in `themes/toolbars.json`, and the picker is in **Settings → Toolbar**.
+star, the URL bar, and the Settings and account buttons. It's a small HTML
+file, so you control its layout and look. Toolbars are listed in
+`themes/toolbars.json`, and the picker is the **Toolbar** setting.
 
 ```json title="themes/toolbars.json"
 [
@@ -20,7 +20,7 @@ in `themes/toolbars.json`, and the picker is in **Settings → Toolbar**.
 | --- | --- | --- |
 | `title` | Yes | The name shown in the picker. |
 | `path` | Yes | The toolbar HTML file, relative to `sdmc:/switch/brewser/`. |
-| `height` | — | Strip height in pixels (clamped 28–200). |
+| `height` | No | Strip height in pixels (clamped 28-200). |
 
 The choice is stored as the entry's *path* in `config.json`'s `toolbar` key.
 
@@ -29,16 +29,16 @@ The choice is stored as the entry's *path* in `config.json`'s `toolbar` key.
 Brewser paints your HTML into a strip across the top (or bottom) of the screen
 and drives it through a small set of hooks:
 
-- **`data-action` on a button** tells the shell what a tap does. The recognised
+- `data-action` on a button tells the shell what a tap does. The recognised
   actions are `back`, `forward`, `reload`, `home`, `star` (bookmark),
   `address-bar` (opens the keyboard to edit the URL), `settings` and `avatar`.
-- **The shell updates the toolbar for you:** it fills the URL field, swaps the
+- The shell updates the toolbar for you: it fills the URL field, swaps the
   bookmark icon between the bookmarked/not-bookmarked images, greys out
-  back/forward when there's no history, and sets a network-status dot. You just
+  back/forward when there's no history, and sets a network-status dot. You
   provide the elements and mark them up.
-- **Icons** are ordinary `<img>` tags. The shipped toolbars load them from
+- Icons are ordinary `<img>` tags. The shipped toolbars load them from
   `sdmc:/switch/brewser/themes/assets/` (e.g. `left.png`, `home.png`,
-  `settings.png`) — drop your own PNGs there and point at them.
+  `settings.png`); drop your own PNGs there and point at them.
 
 A stripped-down toolbar looks like this:
 
@@ -87,7 +87,7 @@ Register it and pick it in Settings:
 Two toolbar preferences live in Settings rather than in the HTML, so the same
 toolbar works either way:
 
-- **Position** — top or bottom of the screen (`config.json` key
+- **Position**: top or bottom of the screen (`config.json` key
   `toolbarPosition`, `"top"` or `"bottom"`). The shell stamps the chosen side on
   the toolbar as `data-toolbar-position`, so your CSS can move the border to the
   page-facing edge:
@@ -97,7 +97,7 @@ toolbar works either way:
     border-bottom: 0; border-top: 2px solid #1f2c4d;
   }
   ```
-- **Show/hide** — the whole strip can be turned off (`showToolbar`), giving apps
+- **Show/hide**: the whole strip can be turned off (`showToolbar`), giving apps
   the full screen.
 
 The `height` from `toolbars.json` sets how tall the strip is; design your layout
@@ -107,4 +107,4 @@ to fill `100vh` so it adapts to whatever height is configured.
 
 - [Cursors](/docs/customize/cursors) and the toolbar icons both live under
   `themes/assets/` and `themes/cursors/`.
-- [Customize Brewser](/docs/customize) — selecting themes and the update caveat.
+- [Customize Brewser](/docs/customize): selecting themes and the update caveat.

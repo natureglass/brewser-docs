@@ -10,32 +10,32 @@ real, persistent storage on the SD card.
 
 | API | Status |
 | --- | --- |
-| **localStorage** | ✅ Real and persistent |
-| **IndexedDB** | ✅ Real and persistent (core API) |
-| `sessionStorage` | ❌ Not implemented |
-| Cache API (`caches`) | ❌ Not implemented |
-| `navigator.storage.estimate()` | ✅ Reports SD-card space |
+| **localStorage** | Real and persistent |
+| **IndexedDB** | Real and persistent (core API) |
+| `sessionStorage` | Not implemented |
+| Cache API (`caches`) | Not implemented |
+| `navigator.storage.estimate()` | Reports SD-card space |
 
-- **localStorage** behaves as usual — synchronous key/value, ideal for settings and small state.
+- **localStorage** behaves as usual: synchronous key/value, ideal for settings and small state.
 - **IndexedDB** covers the everyday surface: databases and versioning, object stores, and
-  `put`/`add`/`get`/`delete`/`clear`/`count`/`getAll`/`getAllKeys`. Advanced pieces —
-  cursors, `IDBKeyRange`, indexes, and auto-increment keys — aren't implemented, so stick to
+  `put`/`add`/`get`/`delete`/`clear`/`count`/`getAll`/`getAllKeys`. Advanced pieces
+  (cursors, `IDBKeyRange`, indexes, and auto-increment keys) aren't implemented, so stick to
   explicit keys and read whole stores rather than cursoring.
 
 ## Where it lives, and how long
 
 Storage is written to JSON files under Brewser's folder on the SD card
-(`sdmc:/switch/brewser/…`). It's loaded at startup and **persists across app launches and across
-Brewser self-updates** — an update swaps Brewser's program files but never touches your storage.
+(`sdmc:/switch/brewser/…`). It's loaded at startup and persists across app launches and across
+Brewser self-updates. An update swaps Brewser's program files but never touches your storage.
 
-There's **no quota** beyond the physical space on your SD card — you won't hit a
-`QuotaExceededError`, but be a considerate citizen with how much you write.
+There's no quota beyond the physical space on your SD card. You won't hit a
+`QuotaExceededError`, but be mindful of how much you write.
 
 ## Isolation: prefix your keys
 
 > **Storage is shared across apps, not sandboxed per app.** All apps on a profile read and write the
 > same `localStorage` and IndexedDB namespace. Two apps that both use a key called `settings`, or a
-> database called `save`, will collide. **Namespace everything with your app id** — e.g.
+> database called `save`, will collide. Namespace everything with your app id, e.g.
 > `com.you.myapp:settings`.
 
 The [`brewser.js` SDK](/docs/features/brewser-sdk) does this for you automatically: its save box is
@@ -43,21 +43,21 @@ keyed by your package id, so apps using the SDK don't step on each other.
 
 ## Offline
 
-Most Brewser apps are fully self-contained and run with no network at all — once downloaded, they
+Most Brewser apps are fully self-contained and run with no network at all; once downloaded, they
 work offline indefinitely. Local storage is always available offline.
 
 For cloud [saves](/docs/features/saves-and-leaderboards), the SDK is **local-first**: every save
 writes to local storage instantly and syncs to your account in the background when you're online.
-Saving never blocks on the network and never fails when you're offline — the upload just happens
+Saving never blocks on the network and never fails when you're offline; the upload happens
 later.
 
-## See it in action
+## Examples
 
-- **`com.natureglass.spectraplay`** and **`com.natureglass.savedemo`** — use `localStorage`.
-- **`com.natureglass.2dplatformermicrogame`** — a Unity title that persists through IndexedDB.
+- `com.natureglass.spectraplay` and `com.natureglass.savedemo` use `localStorage`.
+- `com.natureglass.2dplatformermicrogame` is a Unity title that persists through IndexedDB.
 
 ## Related
 
-- [Saves & Leaderboards](/docs/features/saves-and-leaderboards) — cloud saves on top of local storage.
-- [`brewser.js` SDK](/docs/features/brewser-sdk) — automatic per-app key namespacing.
+- [Saves & Leaderboards](/docs/features/saves-and-leaderboards): cloud saves on top of local storage.
+- [`brewser.js` SDK](/docs/features/brewser-sdk): automatic per-app key namespacing.
 - [Networking in Apps](/docs/runtime/networking).
