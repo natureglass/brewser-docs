@@ -7,7 +7,7 @@ There is no browser to borrow from on the Switch. Brewser's DOM tree, CSS
 cascade, and layout engine are hand-reimplemented in TypeScript (~26K lines)
 running on top of the nx.js/V8 + Skia foundation (see
 [Architecture](/docs/runtime/architecture)). Overall, that hand-written engine
-(DOM, HTML, CSS) covers roughly 80% of the "real-world app" surface.
+(DOM, HTML, CSS) covers roughly 81% of the "real-world app" surface.
 
 This page is the honest list of what's **not** done yet — the gap lists double
 as the contribution roadmap. The last two pillars, WebGL and Audio & Video, are
@@ -30,13 +30,11 @@ real-world breakage reports directly shape what gets built next.
 - `<video>` has no subtitle (`<track>`) tracks; `poster` isn't loaded (a first-frame preview stands in)
 - `iframe` `sandbox` / CSP attributes are parsed but not enforced (treated as same-origin)
 
-## CSS (~79%)
+## CSS (~81%)
 
 - **Cascade:** no `@supports` / `@import` / `@layer` / `@container`; `::placeholder` / `::marker` / `::selection` pseudo-elements unsupported
 - **Layout:** no margin collapsing (margins are additive); grid has no `grid-auto-flow: dense` packing, named grid lines, or subgrid; tables have no `border-collapse` / nested-table promotion; `position: sticky` is vertical + page-level only (not inside nested scroll containers)
 - **Visual:** no 3D / skew / matrix transforms; `transition` doesn't cover geometric properties (width / height / offsets) or `transform: translate` (those need per-frame relayout); no `clip-path`. On rounded boxes the 3D border styles (groove / ridge / inset / outset) render as a solid stroke; `backdrop-filter` on moving (`fixed` / `sticky`) elements applies blur only (colour functions are skipped there to hold 60fps) and its backdrop excludes lower fixed / modal / scroll-container layers
-- **`white-space: pre` / `pre-wrap`** works on `<pre>` and via an inline `style="white-space:pre"`, but not yet when set by a stylesheet class/rule (the parser collapses whitespace before the cascade is known); `pre-line` / `break-spaces` unsupported
-- **Units:** physical units (`cm` / `mm` / `in` / `pt` / `pc` / `Q`) are dropped
 
 ## WebGL 1 & 2 (~88%)
 
@@ -60,7 +58,7 @@ hardware video decode. Full node list and codec matrix:
 |------|----------|------------------------|
 | DOM  | ~84% | `children` elements-only, `outerHTML` setter, document/window capture listeners, `dialog` focus trap |
 | HTML | ~80% | spec parser (insertion modes / `<template>`), multipart form uploads, advanced SVG (SMIL animation / filter-graph primitives), iframe sandbox enforcement |
-| CSS  | ~79% | margin collapsing, 3D / skew / matrix transforms, geometric transitions, `clip-path`, `@supports` / `@layer` |
+| CSS  | ~81% | margin collapsing, 3D / skew / matrix transforms, geometric transitions, `clip-path`, `@supports` / `@layer` |
 | [WebGL 1](/docs/runtime/graphics) | ~92% | exhaustive extension coverage |
 | [WebGL 2](/docs/runtime/graphics) | ~85% | layered / 3D-texture sampling (GPU-driver-limited), full conformance hardening |
 | [Audio & Video](/docs/runtime/audio-and-media) | ~80% | Web Audio effect nodes (filter / convolver / delay / compressor), subtitle tracks, hardware video decode |
