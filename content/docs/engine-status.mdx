@@ -1,125 +1,66 @@
 ---
 title: Engine Status
-description: A coverage map of how complete Brewser's HTML, CSS and DOM engine is
+description: The remaining gaps in Brewser's hand-written HTML, CSS and DOM engine
 ---
 
 There is no browser to borrow from on the Switch. Brewser's DOM tree, CSS
 cascade, and layout engine are hand-reimplemented in TypeScript (~26K lines)
 running on top of the nx.js/V8 + Skia foundation (see
-[Architecture](/docs/runtime/architecture)). It's a real cascade and layout
-engine, not a shim: deep where real pages and libraries exercise it, shallower
-in the less-common corners of the spec.
+[Architecture](/docs/runtime/architecture)). Overall, that hand-written engine
+(DOM, HTML, CSS) covers roughly 70-75% of the "real-world app" surface.
 
-Overall, the hand-written engine (DOM, HTML, CSS) covers roughly 70-75% of the
-"real-world app" surface. This page is the honest map of where each pillar
-stands. It's updated with each release, and the gap lists below double as the
-contribution roadmap.
-
-The last two pillars, WebGL and Audio & Video, work differently: they aren't
-software reimplementations. Instead, Brewser's own hand-built bridges map the
-JavaScript APIs straight to the Switch's GPU and to FFmpeg. Because they run
-natively rather than through a JS reimplementation, they stand higher on the
-coverage map. The open question for them is not whether they're built but how
-much of the API surface and how many extensions are wired through the bridge.
-The summaries below give the headline numbers; the full extension lists, codec
-matrix and gaps live on the [Graphics](/docs/runtime/graphics) and
-[Audio & Media](/docs/runtime/audio-and-media) runtime pages.
-
-## What to expect
-
-**Works very well today:** hand-written pages, jQuery-era scripts, forms,
-canvas/WebGL apps, and audio/video playback.
-
-**Will break today:** libraries that depend on geometric transitions (animating
-width / height / offsets), 3D transforms, or a spec-compliant HTML parser
-(`<template>` content, implicit `<head>` / `<body>` synthesis).
-
-If an app or library breaks for you, [file an issue](https://github.com/natureglass/Brewser/issues)
-with its name. Real-world breakage reports directly shape what gets built next.
+This page is the honest list of what's **not** done yet — the gap lists double
+as the contribution roadmap. The last two pillars, WebGL and Audio & Video, are
+bridge-backed rather than reimplemented, so they stand higher and their detail
+lives on their own pages. If an app or library breaks for you,
+[file an issue](https://github.com/natureglass/Brewser/issues) with its name —
+real-world breakage reports directly shape what gets built next.
 
 ## DOM (~84%)
 
-**Solid / production-grade:**
-
-- Tree mutation: `appendChild` / `removeChild` / `insertBefore` / `replaceChild` / `append` / `prepend` / `before` / `after` / `replaceWith` / `replaceChildren` / `remove` / `normalize` / `insertAdjacentHTML`, all with fragment spreading (and `(Node | string)` args), MutationObserver notification, and paint notify
-- `innerHTML` parses real markup (not just text), `outerHTML` (get-only), `textContent`, `cloneNode`
-- Attributes + `dataset` (full Proxy), `classList`, `getElementById` / `getElementsByClassName` / `getElementsByTagName` / `getElementsByName`
-- `querySelector` / `querySelectorAll` / `closest()` / `matches()` with the full selector engine: combinators (`>` / `+` / `~` / descendant), compound selectors, selector lists, `*`, every attribute matcher (`^=` / `$=` / `*=` / `~=` / `|=`), and pseudo-classes (`:nth-child` family, `:not`, `:first`/`:last-child`, `:checked`, `:empty`…)
-- Element-only traversal: `firstElementChild` / `lastElementChild` / `nextElementSibling` / `previousElementSibling` / `childElementCount`
-- Events: full capture to target to bubble dispatch with `event.target` / `currentTarget` set per node — including on real `new Event()` instances (their read-only accessors are shadowed) so delegation via `e.target.matches()` works — plus `{ capture, once, passive }` options and `stopPropagation`
-- Geometry: `getBoundingClientRect`, `offset*` / `client*` / `scroll*`, `scrollIntoView`
-- MutationObserver (tier-1, wired at every mutation site)
-
-**Notable gaps:**
-
-- `children` still includes text / comment nodes (spec is elements-only). The element-walking accessors above are the correct-behaving alternative
+- `children` still includes text / comment nodes (spec is elements-only); the element-only accessors (`firstElementChild` / `nextElementSibling` / `childElementCount` …) are the correct-behaving alternative
 - `outerHTML` has no setter; document / window-level capture listeners aren't wired
 - `dialog.showModal()` has no focus trap or Esc-to-close; `setPointerCapture` doesn't reroute events
 
 ## HTML (~77%)
 
-**Parser:** tag-soup-tolerant subset. No spec tokenizer or insertion modes, but it handles void elements, self-closing tags, all attribute quoting styles, comments, CDATA sections, raw-text elements (`<script>` / `<style>`), numeric plus ~230 named entities (Latin-1, Greek, math/arrows) with or without the trailing semicolon, and reasonable error recovery.
-
-**Element coverage is broad:** structural and semantic tags, inline text tags, real `<table>` layout, `img` / `canvas` / inline SVG / `video` / `audio` / `iframe`, `details` / `summary`, `dialog`, `meter` / `progress`.
-
-**Forms are the most complete area:** input types text / password / email / checkbox / radio / range / color / date / time / number / file / hidden / button / submit / reset / image, full `<select>` (optgroup, multiple), `<textarea>`, `<label for>`, `<fieldset>` / `<legend>` (border + legend cut-out chrome), submit-button `formaction` / `formmethod` overrides, form reset, constraint validation on submit (`required` / `pattern` / `minlength` / `maxlength` / `min` / `max` / `type=email`, respecting `novalidate` / `formnovalidate`), and both GET (query string) and POST (`application/x-www-form-urlencoded` request body) submission.
-
-**Gaps:**
-
-- Comments and doctype are discarded; no `<template>` content model; no implicit `<html>` / `<head>` / `<body>` synthesis
-- No `multipart/form-data` request bodies yet (binary file upload); urlencoded GET + POST are implemented. No `<datalist>` chrome
-- Inline SVG covers shapes, paths, clip-paths, `<text>` / `<tspan>` (font, `text-anchor`, per-tspan positioning), linear/radial gradients (stops, objectBoundingBox + userSpaceOnUse, `href` inheritance), full `transform` (translate / rotate / scale / skew / matrix), `viewBox` + `preserveAspectRatio`, and stroke styling (dash, line caps/joins, element + fill/stroke opacity), but no patterns, filters, `<image>`, or `<use>`
-- `<video>` has no subtitle (`<track>`) tracks; `poster` image isn't loaded (a first-frame preview stands in)
-- `iframe` sandbox / CSP attributes are parsed but not enforced (treated as same-origin)
+- No spec tokenizer / insertion modes: no `<template>` content model, no implicit `<html>` / `<head>` / `<body>` synthesis, comments and doctype are discarded (the parser is otherwise a tolerant tag-soup subset with error recovery)
+- No `multipart/form-data` request bodies (binary file upload); urlencoded GET + POST work. No `<datalist>` chrome
+- Inline SVG has no patterns, filters, `<image>`, or `<use>` (shapes / paths / `<text>` / gradients / `transform` / `viewBox` are covered)
+- `<video>` has no subtitle (`<track>`) tracks; `poster` isn't loaded (a first-frame preview stands in)
+- `iframe` `sandbox` / CSP attributes are parsed but not enforced (treated as same-origin)
 
 ## CSS (~79%)
 
-**Selectors & cascade (strongest area, ~82%):**
-
-- Full selector syntax including all combinators, the `:nth-child` family (proper an+b), `:not()`, `:hover` / `:focus` / `:checked` / `:disabled` / `:empty`, `::before` / `::after` with `content: attr()`
-- Real specificity + source order, `!important`, UA default stylesheet
-- CSS variables, `calc()` / `min()` / `max()` / `clamp()`, `@media`, `@font-face`, `@keyframes`
-- Gaps: no `@supports` / `@import` / `@layer` / `@container`; `::placeholder` / `::marker` / `::selection` unsupported
-
-**Layout (~76%):** block / inline / inline-block, Flexbox ~80% (including `flex-wrap` with `align-content` / `align-self` / `justify-content: space-evenly`), Grid ~78% (`grid-template-areas` / `grid-area`, `repeat()` with `auto-fit` / `auto-fill` / `minmax()`, `grid-auto-rows` / `grid-auto-columns`, `justify-self` / `align-self` / `justify-items` / `align-items`, `justify-content` / `align-content` track distribution, independent `row-gap` / `column-gap`), tables ~55% (auto column widths, `colspan` / `rowspan`), float, and all positioning (static / relative / absolute / fixed / sticky).
-
-- Gaps: no margin collapsing; grid has no `grid-auto-flow: dense` packing, named grid lines, or subgrid; no table `border-collapse` / nested-table promotion; `position: sticky` is vertical and page-level only (not yet inside nested scroll containers)
-
-**Visual (~75%):** colors, linear/radial gradients, `background-image`, `box-shadow`, `border-radius` (uniform), all `border-style` values (solid / dashed / dotted / double / groove / ridge / inset / outset, per-side), `outline` (with `outline-offset`), `opacity`, `z-index` / stacking, real overflow scrolling, `object-fit`, 2D transforms (translate / rotate / scale), `writing-mode`, `@keyframes` animation, CSS `transition` (opacity / transform / colours, with `cubic-bezier` / `steps` easing), `filter` (blur, brightness / contrast / grayscale / sepia / invert / saturate / hue-rotate / opacity, `drop-shadow`, and combinations), and `backdrop-filter` (frosted glass for `fixed` / `sticky` / normal-flow elements, backdrop sampled from the body cache).
-
-- Gaps: `backdrop-filter` on moving (`fixed` / `sticky`) elements applies blur only (colour functions there are skipped to keep scrolling at 60fps, though they still apply on baked normal-flow elements), and the backdrop excludes lower fixed / modal layers and scroll-container content; `transition` doesn't yet cover geometric properties (width / height / offsets, which need per-frame relayout) or `transform: translate`; on rounded boxes the 3D border styles (groove / ridge / inset / outset) render as a solid stroke; no 3D / skew / matrix transforms, no `clip-path`
-
-**Units (~80%):** `px`, `%`, `em` / `rem`, `vw` / `vh` (+ `dvh` / `svh`), `vmin` / `vmax`, `ch`, `auto`, `env()`, `calc()`. Physical units (`cm` / `mm` / `pt`) are dropped.
+- **Cascade:** no `@supports` / `@import` / `@layer` / `@container`; `::placeholder` / `::marker` / `::selection` pseudo-elements unsupported
+- **Layout:** no margin collapsing (margins are additive); grid has no `grid-auto-flow: dense` packing, named grid lines, or subgrid; tables have no `border-collapse` / nested-table promotion; `position: sticky` is vertical + page-level only (not inside nested scroll containers)
+- **Visual:** no 3D / skew / matrix transforms; `transition` doesn't cover geometric properties (width / height / offsets) or `transform: translate` (those need per-frame relayout); no `clip-path`. On rounded boxes the 3D border styles (groove / ridge / inset / outset) render as a solid stroke; `backdrop-filter` on moving (`fixed` / `sticky`) elements applies blur only (colour functions are skipped there to hold 60fps) and its backdrop excludes lower fixed / modal / scroll-container layers
+- **`white-space: pre` / `pre-wrap`** works on `<pre>` and via an inline `style="white-space:pre"`, but not yet when set by a stylesheet class/rule (the parser collapses whitespace before the cascade is known); `pre-line` / `break-spaces` unsupported
+- **Units:** physical units (`cm` / `mm` / `in` / `pt` / `pc` / `Q`) are dropped
 
 ## WebGL 1 & 2 (~88%)
 
-WebGL isn't a software reimplementation. It's Brewser's own bridge, built out
-from nx.js's initial GL wiring into the complete WebGL 1 & 2 API surface running
-straight on the Switch's Tegra X1 GPU. Shaders and draws run JIT-compiled on
-real silicon, and extensions are driver-probed: a name is advertised only when
-the underlying GL driver actually supports it. The full context / draw / state /
-buffer / texture / shader API is present for both versions. WebGL 1 sits around
-~92%, the safest and most-compatible target, and WebGL 2 around ~85%, supported
-including advanced usage and under active conformance hardening. For the complete
-extension lists, the GLSL ES 3.00 surface, the real-world proof points and the
-current gaps, see [Graphics](/docs/runtime/graphics).
+Bridge-backed, running straight on the Switch's Tegra X1 GPU — not a software
+reimplementation. WebGL 1 sits ~92% (the safest target), WebGL 2 ~85% and under
+active conformance hardening. Remaining gaps are exhaustive extension coverage
+and layered / 3D-texture sampling (GPU-driver-limited). Full extension lists and
+proof points: [Graphics](/docs/runtime/graphics).
 
 ## Audio & Video (~80%)
 
-Like WebGL, audio and video are bridge-backed rather than hand-reimplemented:
-Web Audio runs on a hardware-backed audio graph (~70%), and `<audio>` /
-`<video>` decode in software via FFmpeg (~85%). Playback is solid across a
-broad codec list. The practical ceiling is bandwidth, not format. For the
-full node list, the compatibility shims, the lenient `connect()` behaviour and
-the complete codec matrix, see [Audio & Media](/docs/runtime/audio-and-media).
+Bridge-backed: Web Audio on a hardware-backed graph (~70%), `<audio>` /
+`<video>` decode in software via FFmpeg (~85%). Remaining gaps are the Web Audio
+effect nodes (filter / convolver / delay / compressor), subtitle tracks, and
+hardware video decode. Full node list and codec matrix:
+[Audio & Media](/docs/runtime/audio-and-media).
 
 ## Summary
 
 | Area | Complete | Biggest missing pieces |
 |------|----------|------------------------|
 | DOM  | ~84% | `children` elements-only, `outerHTML` setter, document/window capture listeners, `dialog` focus trap |
-| HTML | ~77% | spec parser (insertion modes / `<template>`), multipart form uploads, SVG richness (patterns / filters / `<image>`), iframe sandbox enforcement |
-| CSS  | ~79% | margin collapsing, 3D transforms, geometric transitions, per-corner `border-radius`, `clip-path` |
+| HTML | ~77% | spec parser (insertion modes / `<template>`), multipart form uploads, SVG richness (patterns / filters / `<image>` / `<use>`), iframe sandbox enforcement |
+| CSS  | ~79% | margin collapsing, 3D / skew / matrix transforms, geometric transitions, `clip-path`, `@supports` / `@layer` |
 | [WebGL 1](/docs/runtime/graphics) | ~92% | exhaustive extension coverage |
 | [WebGL 2](/docs/runtime/graphics) | ~85% | layered / 3D-texture sampling (GPU-driver-limited), full conformance hardening |
 | [Audio & Video](/docs/runtime/audio-and-media) | ~80% | Web Audio effect nodes (filter / convolver / delay / compressor), subtitle tracks, hardware video decode |
