@@ -1,0 +1,113 @@
+---
+title: Offline Mode & Network Behaviour
+description: What Brewser connects to and when, and how Offline Mode works
+---
+
+Brewser is designed to do almost everything from your SD card, so it reaches the network only for a
+few well-defined things. This page lists exactly what those are, explains how Brewser behaves with
+no connection, and describes the **Offline Mode** setting for people who would rather their console
+never starts network traffic on its own.
+
+## What Brewser connects to, and when
+
+Only one of these happens on its own. Everything else waits until you ask for it.
+
+| When | What it does | Where |
+| --- | --- | --- |
+| On boot | A silent catalogue sync, so your app list is up to date | GitHub |
+| On demand | Downloading an app you pick from the catalogue | GitHub |
+| On demand | Checking for and downloading a Brewser update | GitHub |
+| On demand | Telemetry, sign-in, and related cloud features | brewser.io |
+
+The boot catalogue sync is the only thing Brewser starts automatically. App downloads happen when
+you choose an app, the update check and download happen when you ask for them (see
+[Installing & Updating](/docs/getting-started/installing)), and the calls to the site backend at
+brewser.io cover [sign-in](/docs/features/accounts), [cloud saves and
+leaderboards](/docs/features/saves-and-leaderboards), and the anonymous download and rating counts
+described in [Privacy & Your Data](/docs/support/privacy).
+
+> **Brewser never contacts Nintendo's servers.** Nothing it does talks to console-manufacturer
+> infrastructure, so using Brewser does not put your console in touch with Nintendo.
+
+Because of this, Brewser works with DNS-blocking setups such as **90DNS**. Those setups block
+Nintendo's own domains, and Brewser never uses them, so the catalogue, downloads, updates, and cloud
+features all keep working with 90DNS in place.
+
+## Running offline
+
+Brewser runs from cache, so you do not need a connection to use it once it is set up. Your downloaded
+apps, the catalogue cache, and app storage all live under `sdmc:/switch/brewser/`.
+
+With no connection, the silent boot sync is simply skipped and Brewser shows the cached catalogue
+from the last time it synced. Apps you have already downloaded launch and run normally.
+
+The one exception is apps that need the network by nature: streaming and media apps, and
+home-automation or LAN dashboards. Those cannot work without the connection they depend on. Every
+other app, being self-contained, runs the same offline as online.
+
+> **How this is verified.** Offline operation is currently verified in emulator testing. Running
+> with the console's own network fully disabled (for example airplane mode on hardware) has not been
+> separately verified.
+
+## Offline Mode
+
+**Offline Mode** is a checkbox in the shell's **Settings**. It is stored as `offlineMode` in
+`sdmc:/switch/brewser/configs/config.json` and is off by default; you can set it there directly if
+you prefer editing the file.
+
+Running offline (above) is what happens when there is no connection. Offline Mode is a deliberate
+choice: it stops Brewser starting any network activity at all, even when a connection is available.
+
+### What it disables
+
+Offline Mode turns off everything Brewser would otherwise start on its own:
+
+- the silent catalogue sync on boot,
+- the automatic update check,
+- telemetry.
+
+It also disables the **Check for updates** and **Download** buttons in the shell, so no network
+action can be triggered by accident.
+
+> **You will not be notified of new versions while Offline Mode is on.** To update, turn Offline
+> Mode off first, then use **Check for updates** as described in
+> [Installing & Updating](/docs/getting-started/installing).
+
+### How you can tell
+
+- The connectivity indicator shows **orange** whenever Offline Mode is on, regardless of whether you
+  actually have a connection. Green means connected; orange means offline or Offline Mode.
+- On boot, a toast reads "You are running Brewser in offline mode".
+
+### Who it is for
+
+Offline Mode is for people who prefer that their console never initiates network traffic. With it on,
+Brewser stays entirely local until you choose to turn it off.
+
+## Questions
+
+### Is it safe to connect?
+
+Connecting is fine for what Brewser needs. Brewser only talks to GitHub (catalogue and downloads)
+and brewser.io (telemetry, sign-in, and cloud features), and never to Nintendo's servers. As with
+any homebrew on a custom-firmware console, there is a general, non-zero risk to your account; see the
+[FAQ](/docs/support/faq) on ban risk for the community-standard advice. If you would rather Brewser
+never starts a connection on its own, turn on Offline Mode.
+
+### Does Brewser work with 90DNS?
+
+Yes. 90DNS and similar setups block Nintendo's domains, which Brewser never uses, so the catalogue,
+app downloads, updates, and cloud features all continue to work.
+
+### Why is my indicator orange?
+
+The connectivity indicator is orange whenever Offline Mode is on, whatever your real connection is.
+It is also orange when Brewser has no connection. Green means connected with Offline Mode off. If you
+did not expect orange, check whether Offline Mode is ticked in **Settings**.
+
+## Related
+
+- [Installing & Updating](/docs/getting-started/installing): how the in-app updater works.
+- [Privacy & Your Data](/docs/support/privacy): what the anonymous counts and cloud features store.
+- [Networking in Apps](/docs/runtime/networking): what an app's own `fetch` and `WebSocket` reach.
+- [FAQ](/docs/support/faq): ban risk, 90DNS, and running apps offline.
