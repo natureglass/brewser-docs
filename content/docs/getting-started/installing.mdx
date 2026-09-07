@@ -14,7 +14,8 @@ standard Atmosphère setup.
   [FAQ](/docs/support/faq) for the model rundown.
 - An SD card with a little free space.
 - A network connection, to load the [catalogue](/docs/features/catalogue) and sign in. Most apps
-  run fully offline once downloaded.
+  run fully offline once downloaded. See [Offline Mode & Network Behaviour](/docs/offline-mode) for
+  exactly what Brewser connects to, and how to stop it connecting on its own.
 
 ## Install
 
@@ -61,6 +62,9 @@ account and your hardware, so the updater is built to be safe by construction:
 When an update is available you'll see an **Update Brewser** prompt. It downloads, verifies, and
 restarts ("Restarting Brewser… Do not power off"), with no manual file swapping.
 
+If you have turned on [Offline Mode](/docs/offline-mode), the update check and this prompt are
+disabled; turn Offline Mode off to check for and install updates.
+
 All builds are published openly on the
 [GitHub Releases page](https://github.com/natureglass/Brewser/releases/) with changelogs, so you
 can always see what changed, and grab a build by hand if the in-app updater ever fails.
@@ -68,5 +72,6 @@ can always see what changed, and grab a build by hand if the in-app updater ever
 ## Related
 
 - [How the runtime works](/docs/runtime): what happens when you launch an app.
+- [Offline Mode & Network Behaviour](/docs/offline-mode): what Brewser connects to, and running it offline.
 - [Troubleshooting](/docs/support/troubleshooting): if an app won't start.
 - [FAQ](/docs/support/faq): models, ban risk, cost, and "is this piracy?".
