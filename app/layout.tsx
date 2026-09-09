@@ -1,4 +1,5 @@
 import { Provider } from '@/components/provider';
+import { KokoAnalytics } from '@/components/koko-analytics';
 import type { Metadata } from 'next';
 import './global.css';
 
@@ -27,6 +28,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       <link rel="me" href="https://mastodon.gamedev.place/@brewser" />
       <body className="flex flex-col min-h-screen">
         <Provider>{children}</Provider>
+        <KokoAnalytics />
       </body>
     </html>
   );
