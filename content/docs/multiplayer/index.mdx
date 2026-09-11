@@ -1,0 +1,56 @@
+---
+title: Multiplayer
+description: Real-time rooms, shared state and presence for Brewser apps
+---
+
+Brewser apps can talk to each other in real time. The platform runs a small WebSocket
+service at `wss://ws.brewser.io` that groups clients into **rooms**, relays messages
+between them, tracks who is connected, and keeps a small piece of shared state for the
+room.
+
+That is enough to build multiplayer games, co-op experiences, chat, shared whiteboards,
+live dashboards and second-screen controllers, without running a server of your own.
+
+## How it fits together
+
+Every connection belongs to an **app** and a **room**. Clients in the same app and room
+see each other; clients in different rooms are isolated.
+
+```text
+App → Room → Clients
+```
+
+Messages travel on three channels:
+
+| Channel | What it carries |
+| --- | --- |
+| `system` | Connection handshake, presence (join/leave), member lists, errors |
+| `app` | Your own events: `player_move`, `chat_message`, `game_start`, whatever you define |
+| `state` | A small shared JSON object with revision numbers and optional single-owner authority |
+
+## Start here
+
+- **[WebSockets Quick Start](/docs/multiplayer/websockets)**: the full guide, from your
+  first connection to shared state, presence, reconnect handling and the service limits.
+
+## Things to know first
+
+> **It's standard `WebSocket`, not a Brewser API.** There is no `brewser.*` global
+> involved, so the same code runs in Chrome. This keeps to the platform's
+> [compatibility promise](/docs/runtime/web-platform).
+
+- **Room state is in-memory.** Rooms live at most 12 hours, empty rooms are reclaimed, and
+  a server restart clears everything. For anything that must persist, use
+  [Saves & Leaderboards](/docs/features/saves-and-leaderboards).
+- **Declare the host when you publish.** A published app that connects must list
+  `wss://ws.brewser.io` in its [manifest](/docs/publishing/manifest)'s `allowed_origins`,
+  alongside the network capability. The
+  [security scanner](/docs/publishing/security-review) checks this.
+- **Test on hardware.** Emulators generally have no working internet, so real-time
+  features can't be validated there. See [Emulators](/docs/tips/emulator).
+
+## Related
+
+- [Networking in Apps](/docs/runtime/networking): what `fetch`, `XHR` and `WebSocket` reach.
+- [Web Platform Support](/docs/runtime/web-platform): the standards Brewser implements.
+- [Features](/docs/features): the rest of the platform's ecosystem.

@@ -1,0 +1,952 @@
+---
+title: WebSockets Quick Start
+description: Real-time rooms, shared state and presence over wss://ws.brewser.io
+---
+
+**Protocol:** v1.1 &middot; **Endpoint:** `wss://ws.brewser.io`
+
+Brewser WebSockets provides simple real-time communication between clients in the same
+**app + room**. Use it for multiplayer games, shared state, presence, chat, collaboration,
+live dashboards, and other real-time applications.
+
+It is a plain `WebSocket` endpoint, so it works the same in Brewser on the Switch and in a
+desktop browser: nothing here depends on a Brewser-only API. See
+[Networking in Apps](/docs/runtime/networking) for what the runtime's network stack reaches.
+
+---
+
+## 1. The basic idea
+
+Every connection belongs to:
+
+```text
+App → Room → Clients
+```
+
+For example:
+
+```text
+app = my-game
+room = lobby-123
+```
+
+Three players connecting to the same app and room can communicate with each other:
+
+```text
+my-game / lobby-123
+
+ ┌──────────┐
+ │ Player 1 │
+ └────┬─────┘
+      │
+ ┌────▼─────┐
+ │ Brewser  │
+ │ WebSocket│
+ └────┬─────┘
+      │
+ ┌────┴─────────────┐
+ │                  │
+ ▼                  ▼
+Player 2          Player 3
+```
+
+Clients in different rooms are isolated from each other.
+
+---
+
+## 2. Connect
+
+Use a WebSocket URL containing the app and room:
+
+```javascript
+const app = "my-game";
+const room = "lobby-123";
+
+const ws = new WebSocket(
+    `wss://ws.brewser.io?app=${encodeURIComponent(app)}&room=${encodeURIComponent(room)}`
+);
+```
+
+The app and room names may contain:
+
+- letters
+- numbers
+- `_`
+- `.`
+- `-`
+
+Maximum length is **64 characters**.
+
+For example:
+
+```text
+wss://ws.brewser.io?app=my-game&room=lobby-123
+```
+
+---
+
+## 3. Wait for `joined`
+
+After connecting, the server sends a `system/joined` message.
+
+You will receive information such as:
+
+```javascript
+{
+    "v": 1,
+    "channel": "system",
+    "op": "joined",
+    "clientId": "abc123",
+    "app": "my-game",
+    "room": "lobby-123",
+    "roomUuid": "server-generated-uuid",
+    "members": 3,
+    "maxMembers": 32,
+    "seq": 12,
+    "stateRevision": 4,
+    "stateOwner": null,
+    "state": {},
+    "protocol": {
+        "major": 1,
+        "minor": 1,
+        "capabilities": [
+            "hello",
+            "message_ids",
+            "sequence_numbers",
+            "acks",
+            "reconnect_hint",
+            "room_ttl",
+            "state_ownership",
+            "shutdown_event"
+        ]
+    }
+}
+```
+
+The most useful fields are:
+
+| Field | Purpose |
+|---|---|
+| `clientId` | Your unique ID for this connection |
+| `roomUuid` | Unique ID of this particular room instance |
+| `members` | Current number of clients |
+| `state` | Current shared room state |
+| `stateRevision` | Current state version |
+| `stateOwner` | Client currently owning authoritative state |
+| `protocol` | Protocol version and capabilities |
+
+**Important:** `clientId` changes when you reconnect.
+
+---
+
+## 4. Send `hello`
+
+A `hello` message lets your application tell the server which optional protocol features it understands.
+
+It is recommended for all clients, particularly clients that mostly listen for events.
+
+```javascript
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "system",
+    op: "hello",
+    id: "hello-1",
+    data: {
+        client: "my-game/1.0",
+        capabilities: [
+            "acks",
+            "sequence_numbers",
+            "reconnect_hint"
+        ]
+    }
+}));
+```
+
+The server responds with `system/welcome`:
+
+```javascript
+{
+    "v": 1,
+    "channel": "system",
+    "op": "welcome",
+    "clientId": "abc123",
+    "protocol": {
+        "major": 1,
+        "minor": 1
+    },
+    "capabilities": [
+        "acks",
+        "sequence_numbers",
+        "reconnect_hint"
+    ],
+    "serverTime": 1760000000000,
+    "replyTo": "hello-1"
+}
+```
+
+The returned `capabilities` are the features available to **both your client and the server**.
+
+---
+
+## 5. Send application messages
+
+Most applications will primarily use the `app` channel.
+
+You can define your own operations.
+
+For example:
+
+```javascript
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "app",
+    op: "player_move",
+    id: "move-123",
+    data: {
+        x: 10,
+        y: 20
+    }
+}));
+```
+
+The server forwards it to the **other clients in the room**.
+
+They receive:
+
+```javascript
+{
+    "v": 1,
+    "channel": "app",
+    "op": "message",
+    "clientId": "abc123",
+    "event": "player_move",
+    "data": {
+        "x": 10,
+        "y": 20
+    },
+    "messageId": "move-123",
+    "seq": 13,
+    "serverTime": 1760000000000
+}
+```
+
+Notice:
+
+```text
+op       → "message"
+event    → "player_move"
+```
+
+Your application defines the meaning of `event` and `data`.
+
+For example:
+
+```text
+player_move
+player_attack
+chat_message
+game_start
+player_ready
+item_pickup
+```
+
+There is no fixed list of application operations.
+
+---
+
+## 6. Use message IDs
+
+It is strongly recommended to give important outgoing messages an `id`.
+
+For example:
+
+```javascript
+{
+    "v": 1,
+    "channel": "app",
+    "op": "player_ready",
+    "id": "ready-42",
+    "data": {
+        "ready": true
+    }
+}
+```
+
+IDs allow the server to acknowledge messages.
+
+The server can respond with:
+
+```javascript
+{
+    "v": 1,
+    "channel": "app",
+    "op": "ack",
+    "clientId": "abc123",
+    "event": "player_ready",
+    "seq": 14,
+    "replyTo": "ready-42",
+    "serverTime": 1760000000000
+}
+```
+
+A simple recommendation:
+
+```text
+Give every important outgoing message a unique ID.
+```
+
+UUIDs are a good choice.
+
+---
+
+## 7. Read shared room state
+
+Brewser provides a simple server-managed shared state system.
+
+Request the current state:
+
+```javascript
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "state",
+    op: "get",
+    id: "state-get-1"
+}));
+```
+
+The server responds:
+
+```javascript
+{
+    "v": 1,
+    "channel": "state",
+    "op": "state",
+    "clientId": "abc123",
+    "state": {
+        "players": {},
+        "score": 100
+    },
+    "revision": 4,
+    "authoritative": false,
+    "stateOwner": null,
+    "replyTo": "state-get-1"
+}
+```
+
+State is always a JSON object.
+
+---
+
+## 8. Update shared state
+
+State updates use a **revision number**.
+
+Suppose the current revision is:
+
+```text
+4
+```
+
+Send:
+
+```javascript
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "state",
+    op: "set",
+    id: "state-set-1",
+    revision: 4,
+    state: {
+        "players": {
+            "abc123": {
+                "x": 10,
+                "y": 20
+            }
+        },
+        "score": 100
+    }
+}));
+```
+
+If successful, the server broadcasts the new state with:
+
+```text
+revision: 5
+```
+
+The next update must use:
+
+```text
+revision: 5
+```
+
+This prevents two clients from accidentally overwriting each other's changes.
+
+### In simple terms
+
+```text
+Get state
+   ↓
+revision 4
+   ↓
+Modify state
+   ↓
+Set state using revision 4
+   ↓
+Server accepts
+   ↓
+revision becomes 5
+```
+
+If somebody changed the state first, your revision will no longer match and the server returns a `state/conflict`.
+
+---
+
+## 9. Authoritative state ownership
+
+For games and simulations, one client can become the **state owner**.
+
+Request ownership by setting:
+
+```javascript
+authoritative: true
+```
+
+Example:
+
+```javascript
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "state",
+    op: "set",
+    revision: 5,
+    authoritative: true,
+    state: {
+        "players": {},
+        "score": 150
+    }
+}));
+```
+
+That client becomes the state owner.
+
+Only the owner can subsequently modify the state while ownership remains active.
+
+This is useful for:
+
+- multiplayer games
+- simulations
+- game servers
+- shared worlds
+- authoritative physics
+
+To give up ownership:
+
+```javascript
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "state",
+    op: "release",
+    id: "release-1"
+}));
+```
+
+If the owner disconnects, ownership is automatically released.
+
+The state itself remains until the room is deleted.
+
+---
+
+## 10. Presence
+
+The server automatically tells clients when somebody joins or leaves.
+
+Example:
+
+```javascript
+{
+    "v": 1,
+    "channel": "system",
+    "op": "presence",
+    "event": "join",
+    "clientId": "xyz789",
+    "members": 4,
+    "seq": 20
+}
+```
+
+Or:
+
+```javascript
+{
+    "v": 1,
+    "channel": "system",
+    "op": "presence",
+    "event": "leave",
+    "clientId": "xyz789",
+    "members": 3,
+    "seq": 21
+}
+```
+
+This is enough to build a basic player list without implementing your own presence system.
+
+---
+
+## 11. Getting the member list
+
+You can request the current members:
+
+```javascript
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "system",
+    op: "members",
+    id: "members-1"
+}));
+```
+
+The response contains:
+
+```javascript
+{
+    "v": 1,
+    "channel": "system",
+    "op": "members",
+    "members": [
+        {
+            "clientId": "abc123",
+            "connectedAt": 1760000000000,
+            "isStateOwner": true,
+            "client": "my-game/1.0"
+        }
+    ],
+    "count": 1,
+    "replyTo": "members-1"
+}
+```
+
+---
+
+## 12. Sequence numbers
+
+Broadcast events contain a room sequence number:
+
+```javascript
+"seq": 42
+```
+
+Sequence numbers allow you to detect gaps.
+
+For example:
+
+```text
+Received: 40
+Received: 41
+Received: 45
+```
+
+You know that events `42–44` were missed.
+
+Brewser does **not** provide event replay.
+
+If your application detects a gap, you should resynchronize using your own application logic.
+
+For example:
+
+```text
+Sequence gap
+     ↓
+Request current state
+     ↓
+Rebuild local state
+```
+
+For games, this is often the simplest approach.
+
+---
+
+## 13. Reconnecting
+
+Connections can disappear because of:
+
+- network problems
+- server shutdown
+- room limits
+- rate limits
+- slow clients
+- temporary server capacity
+
+Your application should reconnect when appropriate.
+
+Use exponential backoff with jitter rather than reconnecting continuously.
+
+Example strategy:
+
+```text
+1 second
+2 seconds
+4 seconds
+8 seconds
+16 seconds
+30 seconds maximum
+```
+
+If the server provides:
+
+```javascript
+reconnectAfterMs
+```
+
+treat that as the minimum suggested delay.
+
+Some common cases:
+
+| Close code | Meaning | Suggested action |
+|---:|---|---|
+| `4011` | Server shutting down | Reconnect after ~5s |
+| `4012` | Server capacity | Retry later |
+| `4008` | Rate limited | Wait ~60s |
+| `4009` | Room full | Retry after ~10s |
+| `4014` | App capacity | Retry after ~30s |
+| `4015` | Room expired | Reconnect after ~1s |
+| `4010` | Slow client | Reduce traffic before reconnecting |
+| `4013` | Handshake timeout | Fix handshake/client logic |
+
+After reconnecting, you receive a **new `clientId`**.
+
+---
+
+## 14. Heartbeats
+
+You do not normally need to implement your own heartbeat.
+
+The server automatically uses WebSocket ping/pong.
+
+The server:
+
+```text
+Ping every ~15 seconds
+     ↓
+Wait up to ~10 seconds
+     ↓
+No response → disconnect
+```
+
+Browser WebSocket clients automatically handle protocol-level pong responses.
+
+---
+
+## 15. Important limits
+
+You don't need to memorize these, but applications should stay comfortably below them.
+
+| Limit | Maximum |
+|---|---:|
+| Connections | 256 |
+| Connections per IP | 8 |
+| Connections per app | 128 |
+| Members per room | 32 |
+| Rooms | 1024 |
+| Rooms per app | 256 |
+| App/system message | 24 KiB |
+| State message | 64 KiB |
+| Messages/client/second | 80 |
+| Room outbound | 8 MiB/s |
+| Global outbound | 32 MiB/s |
+
+For a normal multiplayer game, these limits should be generous.
+
+---
+
+## 16. Room lifetime
+
+Rooms are created automatically when the first client joins.
+
+A room can remain alive for up to:
+
+```text
+12 hours
+```
+
+Its state is retained while the room exists.
+
+An empty room is removed after approximately:
+
+```text
+60 minutes
+```
+
+The server also removes rooms that reach their maximum lifetime.
+
+**Room state is in-memory.**
+
+A server restart therefore removes all rooms and their state.
+
+Do not use Brewser room state as permanent storage.
+
+---
+
+## 17. Minimal client example
+
+This is enough to get a basic application communicating:
+
+```javascript
+const ws = new WebSocket(
+    "wss://ws.brewser.io?app=my-game&room=lobby"
+);
+
+ws.addEventListener("open", () => {
+    console.log("Connected");
+
+    ws.send(JSON.stringify({
+        v: 1,
+        channel: "system",
+        op: "hello",
+        id: "hello-1",
+        data: {
+            client: "my-game/1.0",
+            capabilities: [
+                "acks",
+                "sequence_numbers",
+                "reconnect_hint"
+            ]
+        }
+    }));
+});
+
+ws.addEventListener("message", (event) => {
+    const message = JSON.parse(event.data);
+
+    console.log("Received:", message);
+
+    if (message.channel === "system") {
+        if (message.op === "joined") {
+            console.log("My client ID:", message.clientId);
+        }
+
+        if (message.op === "presence") {
+            console.log(
+                message.event,
+                message.clientId
+            );
+        }
+    }
+
+    if (message.channel === "app") {
+        if (message.op === "message") {
+            console.log(
+                message.event,
+                message.data
+            );
+        }
+    }
+
+    if (message.channel === "state") {
+        if (message.op === "state") {
+            console.log(
+                "State revision:",
+                message.revision
+            );
+        }
+    }
+});
+
+ws.addEventListener("close", (event) => {
+    console.log(
+        "Disconnected:",
+        event.code,
+        event.reason
+    );
+});
+
+ws.addEventListener("error", (error) => {
+    console.error("WebSocket error:", error);
+});
+```
+
+---
+
+## 18. The three channels
+
+For most developers, you only need to remember this:
+
+### `system`
+
+Brewser-managed functionality:
+
+```text
+hello
+room_info
+members
+presence
+error
+shutdown
+```
+
+### `app`
+
+Your application's real-time messages:
+
+```text
+player_move
+chat_message
+game_start
+player_attack
+...
+```
+
+### `state`
+
+Shared server-managed state:
+
+```text
+get
+set
+release
+```
+
+Think of it as:
+
+```text
+┌──────────────────────────────┐
+│        Brewser Room          │
+│                              │
+│  system → connection/presence│
+│  app    → your messages      │
+│  state  → shared state       │
+│                              │
+└──────────────────────────────┘
+```
+
+---
+
+## 19. Recommended architecture
+
+For a typical multiplayer application:
+
+```text
+                  Brewser
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+       system                  state
+          │                     │
+    presence/users       shared game state
+          │                     │
+          └──────────┬──────────┘
+                     │
+                    app
+                     │
+             game-specific events
+```
+
+Use:
+
+- **`system`** for connection and presence
+- **`app`** for gameplay/events
+- **`state`** for shared state that needs server-side revision control
+
+Don't put everything into `state`.
+
+For example, player movement is usually better as:
+
+```text
+app/player_move
+```
+
+rather than repeatedly replacing the entire game state.
+
+---
+
+## 20. That's all you need to start
+
+A new Brewser WebSocket application can start with just five concepts:
+
+```text
+1. Connect to an app + room
+2. Send hello
+3. Listen for messages
+4. Send app events
+5. Reconnect when disconnected
+```
+
+The most important example is:
+
+```javascript
+// Connect
+const ws = new WebSocket(
+    "wss://ws.brewser.io?app=my-game&room=lobby"
+);
+
+// Send an application event
+ws.send(JSON.stringify({
+    v: 1,
+    channel: "app",
+    op: "player_move",
+    id: "move-1",
+    data: {
+        x: 10,
+        y: 20
+    }
+}));
+```
+
+Everything else is there when your application needs it.
+
+---
+
+## Quick reference
+
+```text
+Endpoint
+wss://ws.brewser.io?app=<app>&room=<room>
+
+Channels
+system
+app
+state
+
+Basic envelope
+{
+    v: 1,
+    channel: "...",
+    op: "..."
+}
+
+Application message
+{
+    v: 1,
+    channel: "app",
+    op: "my_event",
+    id: "unique-id",
+    data: {}
+}
+
+Shared state
+{
+    v: 1,
+    channel: "state",
+    op: "set",
+    revision: 0,
+    state: {}
+}
+
+Request current state
+{
+    v: 1,
+    channel: "state",
+    op: "get",
+    id: "state-1"
+}
+```
+
+**Start with `app` messages. Add `state`, presence, acknowledgements, and ownership only when your application actually needs them.**
+
+## Related
+
+- [Multiplayer](/docs/multiplayer): what real-time on Brewser covers.
+- [Networking in Apps](/docs/runtime/networking): what `fetch`, `XHR` and `WebSocket` reach.
+- [Manifest Reference](/docs/publishing/manifest): declaring `ws.brewser.io` in `allowed_origins`.
+- [Saves & Leaderboards](/docs/features/saves-and-leaderboards): for state that must persist.
+- [Emulators](/docs/tips/emulator): why real-time features need hardware to test.

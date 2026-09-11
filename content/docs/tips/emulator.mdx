@@ -18,8 +18,9 @@ only source of truth for networking, graphics, and performance.
 ## What an emulator will *not* tell you
 
 - **Networking.** Emulators generally don't provide working internet/TCP to the runtime, so
-  anything that uses `fetch`, WebSocket, accounts, or cloud [saves and
-  leaderboards](/docs/features/saves-and-leaderboards) won't behave as it does on a real console.
+  anything that uses `fetch`, WebSocket, accounts, [multiplayer](/docs/multiplayer), or cloud
+  [saves and leaderboards](/docs/features/saves-and-leaderboards) won't behave as it does on a
+  real console.
   Test [networking](/docs/runtime/networking) on hardware.
 - **Graphics fidelity.** The Switch's GPU driver stack renders differently from an emulator's: a
   scene that looks right in an emulator can differ on hardware, and vice versa. Never sign off on

@@ -17,7 +17,10 @@ the same-origin rules a browser enforces.
   [Audio & Media](/docs/runtime/audio-and-media).
 
 `XMLHttpRequest` is a polyfill over the same fetch machinery, so it reaches the same places (a
-synchronous `XHR` GET reads local files instead). `WebSocket` (`ws://` and `wss://`) works too.
+synchronous `XHR` GET reads local files instead). `WebSocket` (`ws://` and `wss://`) works too:
+if you want players or screens talking to each other, Brewser hosts a room service you can
+connect to directly. See [Multiplayer](/docs/multiplayer) and the
+[WebSockets Quick Start](/docs/multiplayer/websockets).
 
 ## Gotchas
 
@@ -51,7 +54,8 @@ Pi-hole, an ESP32 exposing a web endpoint, a NAS. The recipe:
 
 - Point `fetch` at the device over `http://<lan-ip>` (not `https://` to an IP; see above).
 - No CORS headers required on the device.
-- Poll or open a `WebSocket` for live updates.
+- Poll or open a `WebSocket` for live updates (a device's own socket, or a Brewser
+  [room](/docs/multiplayer/websockets) if several screens share state).
 
 ```js
 // Poll a Home Assistant entity over the LAN.
@@ -72,6 +76,8 @@ Browse them at [play.brewser.io](https://play.brewser.io).
 
 ## Related
 
+- [Multiplayer](/docs/multiplayer): real-time rooms, presence and shared state over
+  `wss://ws.brewser.io`.
 - [Manifest Reference](/docs/publishing/manifest): `allowed_origins`.
 - [Security Review](/docs/publishing/security-review): how declared hosts are checked.
 - [Web Platform Support](/docs/runtime/web-platform): the standards Brewser implements.

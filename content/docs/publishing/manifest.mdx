@@ -110,6 +110,15 @@ The security scanner cross-checks the hosts your code actually contacts against 
 undeclared host is flagged. See [Networking in Apps](/docs/runtime/networking) for what the runtime
 can reach, and [Security Review](/docs/publishing/security-review) for how the check works.
 
+WebSocket hosts count too. An app using [Multiplayer](/docs/multiplayer) declares the room service
+alongside its other hosts:
+
+```json
+"allowed_origins": [
+  "wss://ws.brewser.io"
+]
+```
+
 ## What doesn't need declaring
 
 Platform features like [Saves & Leaderboards](/docs/features/saves-and-leaderboards) need nothing
@@ -121,3 +130,4 @@ and only depend on the user being [signed in](/docs/features/accounts) for their
 - [Quickstart](/docs/publishing/quickstart): where these values get filled in.
 - [Content & Submission Policy](/docs/publishing/policy): what's allowed.
 - [Controls](/docs/runtime/controls): `exitGame` and `buttonMapping`.
+- [Multiplayer](/docs/multiplayer): declaring `wss://ws.brewser.io` for real-time apps.
