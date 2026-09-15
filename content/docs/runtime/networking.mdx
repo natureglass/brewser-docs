@@ -13,7 +13,8 @@ the same-origin rules a browser enforces.
   console's configured DNS.
 - Your local network. LAN addresses (`http://192.168.x.x`, a `.local` device, a Raspberry Pi
   dashboard) are reachable, which makes Brewser useful as a hardware or IoT dashboard.
-- HLS and other network media streams, handled by the media pipeline. See
+- HLS and other network media streams, handled by the media pipeline, from any host (see
+  [Media is exempt](#media-is-exempt) below). See
   [Audio & Media](/docs/runtime/audio-and-media).
 
 `XMLHttpRequest` is a polyfill over the same fetch machinery, so it reaches the same places (a
@@ -40,12 +41,65 @@ deliberate: declare exactly what you talk to.
 
 ## Publishing: declare your hosts
 
-A published app that uses the network needs the network capability and every external host
-listed in its [manifest](/docs/publishing/manifest)'s `allowed_origins`. The
+A published app that uses the network needs the network capability and every external host it
+**fetches from** listed in its [manifest](/docs/publishing/manifest)'s `allowed_origins`. The
 [security scanner](/docs/publishing/security-review) compares the hosts your code contacts against
 that list and flags anything undeclared, so keep it accurate, and use literal URLs (assembled or
 obfuscated URLs get flagged). Apps that make no network calls declare nothing, so there's nothing
 to check.
+
+### Media is exempt
+
+`allowed_origins` governs **programmatic** requests — `fetch`, `XMLHttpRequest` and `WebSocket`.
+It does **not** apply to media and image element loads:
+
+| Loaded by | Needs `allowed_origins`? |
+| --- | --- |
+| `fetch`, `XMLHttpRequest`, `WebSocket` | Yes |
+| `<video>`, `<audio>`, `<source>` (including HLS) | No |
+| `<img>`, CSS `background-image` | No |
+| `<script>`, `<link>`, `<iframe>` | Yes |
+
+These loads still need the `network` (or `local_network`) capability — an app that declares no
+network capability loads no remote media — and `local_network` is still LAN-only for them. The
+exemption skips the host list, nothing else.
+
+This exists because a media app's byte sources are the one thing it genuinely cannot know ahead
+of time. An HLS variant resolves to a different CDN edge by region and by hour; an IPTV index
+points at broadcaster hosts in 200+ countries; a self-hosted server's address is typed by the
+user. The old rule pushed those apps into declaring an **empty** `allowed_origins`, which
+switched the check off for their API calls too. Now they can pin the part that is knowable:
+
+```json
+{
+  "permissions": ["network"],
+  "allowed_origins": ["https://gql.twitch.tv", "https://usher.ttvnw.net"]
+}
+```
+
+Streams and artwork then play from wherever those APIs point, while anything the app *fetches*
+stays held to the list.
+
+Note the boundary is the **API that issues the request**, not whether the bytes are "a stream".
+If you fetch an HLS master playlist with `fetch()` to pick a variant yourself — as a Twitch
+client does — that fetch is a fetch, and its host must be declared. Only the URL you hand to the
+`<video>` element is exempt.
+
+### When the user picks the server
+
+If the address comes from the person using the app rather than from you, set
+[`user_origins`](/docs/publishing/manifest) in the manifest. Brewser asks once, on the console,
+before the app reaches a host outside `allowed_origins`, and remembers the answer:
+
+```json
+"permissions": ["local_network", "storage"],
+"allowed_origins": [],
+"user_origins": true
+```
+
+The prompt is drawn by the shell, not by your page, and offers Allow / Just once / Deny. Media
+and image loads never raise it, `*.brewser.io` never raises it, and a redirect to an unapproved
+host is refused rather than re-asked.
 
 ## The Home-Assistant / LAN-dashboard pattern
 

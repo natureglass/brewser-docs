@@ -60,7 +60,8 @@ This is the generated manifest for the [Save Demo](https://play.brewser.io) app
 | `categories` | Yes | string[] | One or more catalogue categories. |
 | `permissions` | Yes | string[] | Declared capabilities; see [below](#permissions). May be empty. |
 | `compatibility` | Yes | string[] | Where the app runs: `switch`, `web`, `mobile`. |
-| `allowed_origins` | Yes | string[] | External `https?://` hosts the app is allowed to reach. Empty if it makes no network calls. |
+| `allowed_origins` | Yes | string[] | External `https?://` hosts the app may `fetch`/`XHR`/`WebSocket`. Media and image element loads are exempt — see [below](#network-needs-two-things). Empty if it makes no network calls. |
+| `user_origins` | No | boolean | Set when the server address is chosen by the user at runtime. Undeclared origins then raise a one-time on-console approval instead of being denied — see [below](#when-the-user-picks-the-server-user_origins). |
 | `developer` | Yes | string | Your publisher display name. |
 | `license` | Yes | string | An SPDX-style license id (MIT, Apache-2.0, GPL-3.0, …). |
 | `exitGame` | Yes | string | The controller button that exits the app (see [Controls](/docs/runtime/controls)). |
@@ -118,6 +119,51 @@ alongside its other hosts:
   "wss://ws.brewser.io"
 ]
 ```
+
+**Media and images are exempt.** The list applies to what your code *fetches* — `fetch`,
+`XMLHttpRequest`, `WebSocket`, and `<script>` / `<link>` / `<iframe>` loads. It does not apply to
+`<video>`, `<audio>`, `<source>` (HLS included), `<img>` or CSS `background-image`. Those still
+need the network capability, but they can load from any host.
+
+That's there so a streaming app can pin what it knows without having to guess what it can't. A
+Twitch client declares its two API hosts and plays from whichever CDN edge the API hands back:
+
+```json
+"permissions": ["network"],
+"allowed_origins": ["https://gql.twitch.tv", "https://usher.ttvnw.net"]
+```
+
+The split follows the API that issues the request, not the kind of bytes that come back. If you
+`fetch()` an HLS playlist to parse it yourself, that host must be declared; only the URL you hand
+to `<video>` is exempt.
+
+Brewser's own `*.brewser.io` services (Saves, Leaderboards, the `wss://ws.brewser.io` relay) are
+exempt too, over TLS only. You never declare those.
+
+### When the user picks the server: `user_origins`
+
+Some apps can't declare anything, because the address is typed by the person using them — a
+Jellyfin server, a Home Assistant box, a NAS. Set `user_origins`:
+
+```json
+{
+  "permissions": ["local_network", "storage"],
+  "allowed_origins": [],
+  "user_origins": true
+}
+```
+
+Brewser then asks once, on the console, before your app reaches a host that isn't in
+`allowed_origins`, and remembers the answer for that app. The prompt is drawn by the shell, not by
+your page, and offers **Allow** (remembered), **Just once**, or **Deny**.
+
+This is **tighter** than leaving `allowed_origins` empty, not looser. An empty list on its own
+means no origin restriction at all; with `user_origins` set, an empty list means *every* origin
+needs approval. That's why the [security scanner](/docs/publishing/security-review) stops flagging
+`network` with an empty list once you opt in.
+
+Nothing else changes: media and image element loads still never prompt, `*.brewser.io` still never
+prompts, and a redirect to a host the user didn't approve is refused rather than re-asked.
 
 ## What doesn't need declaring
 

@@ -52,8 +52,10 @@ passes. You can avoid almost every false flag by following a few habits:
 - **Use literal URLs and API names.** Reaching the network through an assembled string
   (`window['fe' + 'tch']`, `location['hos' + 'tname']`) or a computed property looks like evasion.
   Write `fetch('https://api.example.com/…')` plainly.
-- **Declare every external host** in [`allowed_origins`](/docs/publishing/manifest). A request to a
-  host you didn't declare is flagged as unexpected egress.
+- **Declare every external host you fetch from** in
+  [`allowed_origins`](/docs/publishing/manifest). A `fetch`/`XHR`/`WebSocket` to a host you didn't
+  declare is flagged as unexpected egress. Media and image element loads (`<video>`, `<audio>`,
+  `<img>`, CSS backgrounds) are exempt from the list — they still need the network capability.
 - **Stay in your own storage.** Reading another app's `localStorage` keys, enumerating databases,
   or reading `localStorage['brewser_auth']` are all flagged. The last one is flagged hard if the
   value then leaves the device.
